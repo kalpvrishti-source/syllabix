@@ -96,10 +96,10 @@
         }
         
         .cat-screen-title {
-            font-size: 2rem; margin-bottom: 5px; letter-spacing: 2px;
+            font-size: 2rem; margin-bottom: 5px; letter-spacing: 2px; text-align: center;
         }
         .cat-screen-sub {
-            color: #818384; margin-bottom: 30px; font-size: 0.9rem;
+            color: #818384; margin-bottom: 30px; font-size: 0.9rem; text-align: center;
         }
 
         .cat-grid {
@@ -226,6 +226,7 @@
         .btn-share { background-color: var(--correct); }
         .btn-restart { background-color: #1976d2; }
         .btn-yes { background-color: var(--correct); }
+        .btn-download { background-color: #f5793a; }
         
         select {
             background-color: #565758; color: white; border: 0; 
@@ -283,6 +284,7 @@
             <button class="icon-btn" onclick="toggleModal('helpModal')" title="How to play">?</button>
             <button class="icon-btn" onclick="openStats()" title="Statistics">📊</button>
             <button class="icon-btn" onclick="toggleModal('dictModal')" title="Word Examples">📚</button>
+            <button class="icon-btn" onclick="openShareAppMenu()" title="Share or Download Game">📥</button>
         </div>
         <h1>SYLLABIX</h1>
         <div class="header-right">
@@ -385,6 +387,31 @@
         </div>
     </div>
 
+    <div id="appShareModal" class="modal" onclick="toggleModal('appShareModal')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h3 style="text-align: center; margin-top: 0; letter-spacing: 1px;">SHARE & DOWNLOAD</h3>
+            <p style="font-size: 0.85rem; color: #818384; text-align: center; margin-top: -10px;">Send to friends or keep it forever!</p>
+            
+            <div style="margin: 25px 0;">
+                <label style="font-size: 0.8rem; font-weight: bold; color: var(--text); text-transform: uppercase;">1. Share Game Link</label>
+                <div style="display: flex; gap: 10px; margin-top: 8px;">
+                    <input type="text" id="gameLinkInput" readonly style="flex: 1; padding: 10px; background: #121213; color: #85c0f9; border: 1px solid var(--border); border-radius: 4px; font-size: 0.9rem;">
+                    <button class="action-btn btn-share" onclick="copyGameLink()">Copy</button>
+                </div>
+            </div>
+
+            <hr style="border: 0.5px solid var(--border); margin: 20px 0;">
+
+            <div style="text-align: center; margin-bottom: 10px;">
+                <label style="font-size: 0.8rem; font-weight: bold; color: var(--text); text-transform: uppercase; display: block; text-align: left; margin-bottom: 8px;">2. Download to Device</label>
+                <button class="action-btn btn-download" style="width: 100%; padding: 12px; font-size: 1rem;" onclick="downloadGameOffline()">💾 Download Offline Game</button>
+                <p style="font-size: 0.75rem; color: #818384; margin-top: 10px;">This downloads Syllabix directly to your phone or PC. You can open the file anytime to play without internet!</p>
+            </div>
+
+            <button class="action-btn" onclick="toggleModal('appShareModal')" style="margin-top:15px; width: 100%;">Close</button>
+        </div>
+    </div>
+
     <script>
         // 1. App Startup Flow
         window.addEventListener('load', () => {
@@ -421,10 +448,8 @@
             "Geopolitics": ["TRADE", "POWER", "TREAT", "ALLYS", "ASIAN", "STATE", "WORLD", "NAVAL", "PEACE", "CLASH", "SPIES"]
         };
 
-        // Massive block of 1,500+ common English words hidden in a string to keep the file clean
         const COMMON_WORDS_STRING = "ABOUT,ABOVE,ABUSE,ACTOR,ACUTE,ADAPT,ADMIT,ADOPT,ADULT,AFTER,AGAIN,AGENT,AGREE,AHEAD,ALARM,ALBUM,ALERT,ALIEN,ALIGN,ALIKE,ALIVE,ALLOW,ALONE,ALONG,ALTER,AMONG,ANGER,ANGLE,ANGRY,APPLE,APPLY,ARENA,ARGUE,ARISE,ARRAY,ARROW,ASIAN,ASIDE,ASSET,AUDIO,AUDIT,AVOID,AWAKE,AWARD,AWARE,AWFUL,BACON,BAKER,BASIC,BASIN,BASIS,BATCH,BEACH,BEARD,BEAST,BEGIN,BEING,BELOW,BENCH,BILLY,BIRTH,BLACK,BLADE,BLAME,BLANK,BLIND,BLOCK,BLOOD,BOARD,BOAST,BONUS,BOOST,BOOTH,BOUND,BRAIN,BRAKE,BRAND,BREAD,BREAK,BREED,BRICK,BRIDE,BRIEF,BRING,BROAD,BROKE,BROWN,BRUSH,BUILD,BUILT,BUYER,CABIN,CABLE,CATCH,CAUSE,CHAIN,CHAIR,CHART,CHASE,CHEAP,CHECK,CHEEK,CHEER,CHESS,CHEST,CHIEF,CHILD,CHINA,CHOIR,CHOSE,CIVIC,CIVIL,CLAIM,CLASS,CLEAN,CLEAR,CLERK,CLICK,CLOCK,CLOSE,COACH,COAST,COLON,COLOR,COMIC,CORAL,COTTON,COUCH,COULD,COUNT,COURT,COVER,CRACK,CRAFT,CRASH,CRAZY,CREAM,CRIME,CROSS,CROWD,CROWN,CRUEL,CURVE,CYCLE,DAILY,DANCE,DATED,DEALT,DEATH,DEBUT,DELAY,DEPTH,DEVIL,DIARY,DIGIT,DIRTY,DISCO,DITCH,DONOR,DOUBT,DRAFT,DRAMA,DRAWN,DREAM,DRESS,DRILL,DRINK,DRIVE,DRUNK,EAGER,EAGLE,EARLY,EARTH,EIGHT,ELITE,EMPTY,ENEMY,ENJOY,ENTER,ENTRY,EQUAL,ERROR,ESSAY,EVENT,EVERY,EXACT,EXIST,EXTRA,FAITH,FALSE,FAULT,FIBER,FIELD,FIFTH,FIFTY,FIGHT,FINAL,FIRST,FIXED,FLASH,FLEET,FLESH,FLIGHT,FLOOR,FLOUR,FLUID,FOCUS,FORCE,FORTH,FORTY,FORUM,FOUND,FRAME,FRAUD,FRESH,FRONT,FRUIT,FULLY,FUNNY,GIANT,GIVEN,GLASS,GLOBE,GLORY,GOING,GRACE,GRADE,GRAND,GRANT,GRASS,GREAT,GREEN,GROSS,GROUP,GROWN,GUARD,GUESS,GUEST,GUIDE,HABIT,HAPPY,HARSH,HEART,HEAVY,HELLO,HENCE,HORSE,HOTEL,HOUSE,HUMAN,IDEAL,IMAGE,INDEX,INNER,INPUT,ISSUE,JOINT,JUDGE,JUICE,KNOWN,LABEL,LABOR,LARGE,LATER,LAUGH,LAYER,LEARN,LEASE,LEAST,LEAVE,LEGAL,LEMON,LEVEL,LIGHT,LIMIT,LINEN,LOCAL,LOGIC,LOOSE,LOWER,LUCKY,LUNCH,MAGIC,MAJOR,MAKER,MARCH,MARRY,MATCH,MAYBE,MAYOR,MEANT,MEDIA,MERIT,METAL,METER,MIGHT,MINOR,MINUS,MIXED,MODEL,MONEY,MONTH,MORAL,MOTOR,MOUNT,MOUSE,MOUTH,MOVIE,MUSIC,NEEDS,NEVER,NEWLY,NIGHT,NOISE,NORTH,NOVEL,NURSE,OCCUR,OCEAN,OFFER,OFTEN,ONION,ORDER,ORGAN,OTHER,OUGHT,OUNCE,OUTER,OWNER,PANEL,PAPER,PARTY,PATCH,PEACE,PHASE,PHONE,PHOTO,PIANO,PIECE,PILOT,PITCH,PLACE,PLAIN,PLANE,PLANT,PLATE,POINT,POUND,POWER,PRESS,PRICE,PRIDE,PRIME,PRINT,PRIOR,PRIZE,PROOF,PROUD,PROVE,QUEEN,QUICK,QUIET,QUITE,RADIO,RAISE,RANGE,RAPID,RATIO,REACH,REACT,READY,REALM,REBEL,REFER,RELAX,RELAY,REPLY,RIGHT,RIVER,ROMAN,ROUGH,ROUND,ROUTE,ROYAL,RURAL,SCALE,SCENE,SCOPE,SCORE,SENSE,SERVE,SETUP,SEVEN,SHALL,SHAPE,SHARE,SHARP,SHEET,SHELF,SHELL,SHIFT,SHIRT,SHOCK,SHOOT,SHORT,SHOWN,SIGHT,SINCE,SIXTH,SIXTY,SKILL,SLEEP,SLIDE,SMALL,SMART,SMILE,SMITH,SMOKE,SOLID,SOLVE,SORRY,SOUND,SOUTH,SPACE,SPARE,SPEAK,SPEED,SPELL,SPEND,SPENT,SPLIT,SPOKE,SPORT,STAFF,STAGE,STAND,START,STATE,STEAM,STEEL,STICK,STILL,STOCK,STONE,STOOD,STORE,STORM,STORY,STRIP,STUCK,STUDY,STUFF,STYLE,SUGAR,SUPER,SWEET,TABLE,TAKEN,TASTE,TAXES,TEACH,TEETH,TENTH,TEXAS,THANK,THEFT,THEIR,THEME,THERE,THESE,THICK,THIEF,THING,THINK,THIRD,THOSE,THREE,THREW,THROW,TIGER,TIGHT,TIMES,TITLE,TODAY,TOPIC,TOTAL,TOUCH,TOUGH,TOWER,TRACK,TRADE,TRAIN,TREAT,TREND,TRIAL,TRIBE,TRICK,TRUCK,TRULY,TRUST,TRUTH,TWICE,UNDER,UNION,UNITY,UNTIL,UPPER,UPSET,URBAN,USAGE,USUAL,VALID,VALUE,VIDEO,VIRUS,VISIT,VITAL,VOICE,VOTER,WAGON,WASTE,WATCH,WATER,WHEEL,WHERE,WHICH,WHILE,WHITE,WHOLE,WHOSE,WOMAN,WOMEN,WORDS,WORLD,WORRY,WORSE,WORST,WORTH,WOULD,WOUND,WRITE,WRONG,YIELD,YOUNG,YOUTH";
         
-        // Merge the common words with the specific category words, and remove any duplicates
         const VALID_GUESSES = [
             ...new Set([
                 ...Object.values(CATEGORIES).flat(),
@@ -586,8 +611,6 @@
         async function submitGuess() {
             const guess = guesses[currentRow];
             
-            // THE STRICT DICTIONARY CHECK IS BACK!
-            // It now uses the 1,500+ word dictionary to block random gibberish.
             if (!VALID_GUESSES.includes(guess)) {
                 shakeRow(); showMsg("Not in word list");
                 setTimeout(() => { if(!gameOver && document.getElementById('message').textContent === "Not in word list") showMsg(""); }, 1500);
@@ -632,7 +655,7 @@
             }
         }
 
-        // 6. Extras (Hints, Modals, Stats)
+        // 6. Extras (Hints, Modals, Stats, Sharing)
         function getHint() {
             if(gameOver) return;
             let foundLetters = [];
@@ -724,7 +747,47 @@
         function shareResults() {
             const text = `Syllabix [${currentCategory}] ${currentRow === 6 && guesses[5] !== targetWord ? 'X' : currentRow + 1}/6 (${document.getElementById('timer').textContent})\n\n${boardEmoji.join('\n')}`;
             navigator.clipboard.writeText(text);
-            showMsg("Copied to clipboard!");
+            showMsg("Results copied to clipboard!");
+            setTimeout(() => { if(document.getElementById('message').textContent === "Results copied to clipboard!") showMsg(""); }, 2000);
+        }
+
+        // NEW: App Share & Download Functions
+        function openShareAppMenu() {
+            // Automatically grab the live website URL (or show a placeholder if they are offline)
+            let currentUrl = window.location.href;
+            if (currentUrl.includes("file://") || currentUrl.includes("C:/")) {
+                currentUrl = "https://your-github-username.github.io/syllabix/"; // Fallback for offline testing
+            }
+            document.getElementById('gameLinkInput').value = currentUrl;
+            toggleModal('appShareModal');
+        }
+
+        function copyGameLink() {
+            const linkInput = document.getElementById('gameLinkInput');
+            linkInput.select();
+            navigator.clipboard.writeText(linkInput.value);
+            showMsg("App link copied!");
+            setTimeout(() => { if(document.getElementById('message').textContent === "App link copied!") showMsg(""); }, 2000);
+        }
+
+        function downloadGameOffline() {
+            // Packages the entire HTML document into a downloadable file
+            const htmlContent = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+            const blob = new Blob([htmlContent], { type: "text/html" });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = "Syllabix_Game.html"; // The name of the file they will download
+            
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showMsg("Download started!");
+            setTimeout(() => { if(document.getElementById('message').textContent === "Download started!") showMsg(""); }, 2000);
+            toggleModal('appShareModal'); // Close the menu
         }
 
         window.addEventListener('keydown', e => {
