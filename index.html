@@ -139,7 +139,10 @@
             padding-bottom: 15px; margin-bottom: 15px;
         }
         .header h1 { margin: 0; font-size: 2.2rem; letter-spacing: 2px; text-align: center; text-transform: uppercase; }
-        .header-left { display: flex; gap: 10px; justify-content: flex-start; }
+        
+        /* Fixed to include all 4 buttons! */
+        .header-left { display: flex; gap: 8px; justify-content: flex-start; flex-wrap: wrap; }
+        
         .header-right { display: flex; flex-direction: column; align-items: flex-end; font-size: 0.85rem; }
         #timer { font-family: monospace; font-size: 1.1rem; color: #818384; }
         
@@ -148,7 +151,7 @@
             border-radius: 50%; width: 35px; height: 35px; 
             cursor: pointer; font-weight: bold; font-size: 1.1rem;
             display: flex; justify-content: center; align-items: center;
-            transition: background 0.2s;
+            transition: background 0.2s; padding: 0;
         }
         .icon-btn:hover { background: #3a3a3c; }
 
@@ -206,6 +209,11 @@
         .graph-num { width: 15px; }
         .graph-bar { background-color: #3a3a3c; height: 20px; margin-left: 10px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; min-width: 20px; }
         .graph-bar.highlight { background-color: var(--correct); }
+
+        /* Category Dictionary Styles */
+        .dict-list { max-height: 250px; overflow-y: auto; text-align: left; font-size: 0.95rem; padding: 10px; border-radius: 5px; background: #121213; border: 1px solid var(--border); }
+        .dict-list p { margin: 8px 0; border-bottom: 1px solid #3a3a3c; padding-bottom: 5px; }
+        .dict-list p:last-child { border-bottom: none; }
 
         /* UI Controls */
         .controls { display: flex; gap: 15px; margin: 15px 0; align-items: center; font-size: 0.85rem; flex-wrap: wrap; justify-content: center;}
@@ -266,6 +274,7 @@
         <div class="header-left">
             <button class="icon-btn" onclick="toggleModal('helpModal')" title="How to play">?</button>
             <button class="icon-btn" onclick="openStats()" title="Statistics">📊</button>
+            <button class="icon-btn" onclick="toggleModal('dictModal')" title="Word Examples">📚</button>
             <button class="icon-btn" onclick="openShareAppMenu()" title="Share or Download Game">📥</button>
         </div>
         <h1>SYLLABIX</h1>
@@ -340,6 +349,26 @@
         </div>
     </div>
 
+    <div id="dictModal" class="modal" onclick="toggleModal('dictModal')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h3 style="text-align: center; margin-top: 0;">CATEGORY EXAMPLES</h3>
+            <p style="font-size: 0.85rem; color: #818384; text-align: center; margin-top: -10px;">A sneak peek at the types of words in each subject!</p>
+            <div class="dict-list">
+                <p><b>🌍 General:</b> SMART, BOARD, CLOCK...</p>
+                <p><b>🔭 Science:</b> ATOMS, FORCE, LASER...</p>
+                <p><b>🧪 Chemistry:</b> AMINE, OZONE, MOLAR...</p>
+                <p><b>🧬 Biology:</b> CELLS, BRAIN, VIRUS...</p>
+                <p><b>🦁 Zoology:</b> TIGER, WHALE, EAGLE...</p>
+                <p><b>🪐 Astronomy:</b> MARS, COMET, ORBIT...</p>
+                <p><b>🏛️ History:</b> INDUS, RUINS, MYTHS...</p>
+                <p><b>🎵 Music Tech:</b> AUDIO, MIXER, TEMPO...</p>
+                <p><b>➗ Maths / JEE:</b> GRAPH, SLOPE, AXIOM...</p>
+                <p><b>🌐 Geopolitics:</b> TRADE, ALLYS, PEACE...</p>
+            </div>
+            <button class="action-btn" onclick="toggleModal('dictModal')" style="margin-top:20px; width: 100%;">Close</button>
+        </div>
+    </div>
+
     <div id="appShareModal" class="modal" onclick="toggleModal('appShareModal')">
         <div class="modal-content" onclick="event.stopPropagation()">
             <h3 style="text-align: center; margin-top: 0; letter-spacing: 1px;">SHARE & DOWNLOAD</h3>
@@ -371,7 +400,7 @@
     </div>
 
     <script>
-        // --- NEW: WEB AUDIO API SYNTHESIZER ---
+        // --- WEB AUDIO API SYNTHESIZER ---
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
         function playSound(type) {
@@ -386,7 +415,6 @@
             const now = audioCtx.currentTime;
             
             if (type === 'tap') {
-                // High, short mechanical tick
                 oscillator.type = 'sine';
                 oscillator.frequency.setValueAtTime(800, now);
                 oscillator.frequency.exponentialRampToValueAtTime(300, now + 0.05);
@@ -395,7 +423,6 @@
                 oscillator.start(now);
                 oscillator.stop(now + 0.05);
             } else if (type === 'error') {
-                // Low buzzer
                 oscillator.type = 'sawtooth';
                 oscillator.frequency.setValueAtTime(150, now);
                 gainNode.gain.setValueAtTime(0.2, now);
@@ -403,12 +430,11 @@
                 oscillator.start(now);
                 oscillator.stop(now + 0.2);
             } else if (type === 'win') {
-                // Cheerful 4-note chime
                 oscillator.type = 'triangle';
-                oscillator.frequency.setValueAtTime(440, now); // A4
-                oscillator.frequency.setValueAtTime(554.37, now + 0.1); // C#5
-                oscillator.frequency.setValueAtTime(659.25, now + 0.2); // E5
-                oscillator.frequency.setValueAtTime(880, now + 0.3); // A5
+                oscillator.frequency.setValueAtTime(440, now); 
+                oscillator.frequency.setValueAtTime(554.37, now + 0.1); 
+                oscillator.frequency.setValueAtTime(659.25, now + 0.2); 
+                oscillator.frequency.setValueAtTime(880, now + 0.3); 
                 gainNode.gain.setValueAtTime(0.2, now);
                 gainNode.gain.linearRampToValueAtTime(0, now + 0.6);
                 oscillator.start(now);
@@ -416,7 +442,6 @@
             }
         }
 
-        // Trigger Audio & Physical Vibration
         function triggerFeedback(type) {
             playSound(type);
             if (!('vibrate' in navigator)) return;
@@ -467,7 +492,6 @@
         let stats = JSON.parse(localStorage.getItem('syllabix-stats-v2')) || { played: 0, won: 0, currentStreak: 0, maxStreak: 0, guesses: {1:0, 2:0, 3:0, 4:0, 5:0, 6:0} };
 
         function startGame(category) {
-            // First interaction unlocks AudioContext in browsers
             if (audioCtx.state === 'suspended') audioCtx.resume();
             
             currentCategory = category;
@@ -519,7 +543,6 @@
                 row.forEach(key => {
                     const keyEl = document.createElement('div'); keyEl.className = 'tk-key';
                     keyEl.id = `tk-${key}`; keyEl.textContent = key;
-                    // Trigger sound/haptic when touching on-screen keys
                     keyEl.addEventListener('click', () => {
                         triggerFeedback('tap');
                         handleInput(key);
@@ -628,7 +651,7 @@
                 
                 await new Promise(r => setTimeout(r, 150));
                 t.classList.add('flip');
-                triggerFeedback('tap'); // Small tick as each card flips
+                triggerFeedback('tap'); 
                 
                 if(char === targetWord[i]) { 
                     t.classList.add('correct'); rowEmoji += document.getElementById('contrastToggle').checked ? "🟧" : "🟩"; status = "correct";
@@ -788,7 +811,6 @@
 
         window.addEventListener('keydown', e => {
             if(e.ctrlKey || e.metaKey || e.altKey) return;
-            // Physical keyboard trigger
             if(/^[a-zA-Z]$/.test(e.key) || e.key === 'Backspace' || e.key === 'Enter') triggerFeedback('tap');
             handleInput(e.key);
         });
