@@ -139,10 +139,7 @@
             padding-bottom: 15px; margin-bottom: 15px;
         }
         .header h1 { margin: 0; font-size: 2.2rem; letter-spacing: 2px; text-align: center; text-transform: uppercase; }
-        
-        /* Fixed to include all 4 buttons! */
         .header-left { display: flex; gap: 8px; justify-content: flex-start; flex-wrap: wrap; }
-        
         .header-right { display: flex; flex-direction: column; align-items: flex-end; font-size: 0.85rem; }
         #timer { font-family: monospace; font-size: 1.1rem; color: #818384; }
         
@@ -257,25 +254,26 @@
         <div class="cat-screen-sub">Select a category to start the game</div>
         
         <div class="cat-grid">
-            <button class="cat-btn-large" onclick="startGame('General')">🌍 General</button>
-            <button class="cat-btn-large" onclick="startGame('Science')">🔭 Science</button>
-            <button class="cat-btn-large" onclick="startGame('Chemistry')">🧪 Chemistry</button>
-            <button class="cat-btn-large" onclick="startGame('Biology')">🧬 Biology</button>
-            <button class="cat-btn-large" onclick="startGame('Zoology')">🦁 Zoology</button>
-            <button class="cat-btn-large" onclick="startGame('Astronomy')">🪐 Astronomy</button>
-            <button class="cat-btn-large" onclick="startGame('History')">🏛️ History</button>
-            <button class="cat-btn-large" onclick="startGame('Maths')">➗ Maths / JEE</button>
-            <button class="cat-btn-large" onclick="startGame('Music')">🎵 Music Tech</button>
-            <button class="cat-btn-large" onclick="startGame('Geopolitics')">🌐 Geopolitics</button>
+            <button class="cat-btn-large" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); startGame('General')">🌍 General</button>
+            <button class="cat-btn-large" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); startGame('Science')">🔭 Science</button>
+            <button class="cat-btn-large" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); startGame('Chemistry')">🧪 Chemistry</button>
+            <button class="cat-btn-large" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); startGame('Biology')">🧬 Biology</button>
+            <button class="cat-btn-large" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); startGame('Zoology')">🦁 Zoology</button>
+            <button class="cat-btn-large" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); startGame('Astronomy')">🪐 Astronomy</button>
+            <button class="cat-btn-large" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); startGame('History')">🏛️ History</button>
+            <button class="cat-btn-large" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); startGame('Maths')">➗ Maths / JEE</button>
+            <button class="cat-btn-large" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); startGame('Music')">🎵 Music Tech</button>
+            <button class="cat-btn-large" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); startGame('Geopolitics')">🌐 Geopolitics</button>
         </div>
     </div>
 
     <div class="header">
         <div class="header-left">
-            <button class="icon-btn" onclick="toggleModal('helpModal')" title="How to play">?</button>
-            <button class="icon-btn" onclick="openStats()" title="Statistics">📊</button>
-            <button class="icon-btn" onclick="toggleModal('dictModal')" title="Word Examples">📚</button>
-            <button class="icon-btn" onclick="openShareAppMenu()" title="Share or Download Game">📥</button>
+            <button class="icon-btn" onclick="triggerFeedback('ui-click'); toggleModal('helpModal')" title="How to play">?</button>
+            <button class="icon-btn" onclick="triggerFeedback('ui-click'); openStats()" title="Statistics">📊</button>
+            <button class="icon-btn" onclick="triggerFeedback('ui-click'); toggleModal('dictModal')" title="Word Examples">📚</button>
+            <button class="icon-btn" onclick="triggerFeedback('ui-click'); openShareAppMenu()" title="Share or Download Game">📥</button>
+            <button class="icon-btn" id="muteBtn" onclick="toggleMute()" title="Toggle Sound">🔊</button>
         </div>
         <h1>SYLLABIX</h1>
         <div class="header-right">
@@ -284,7 +282,7 @@
     </div>
 
     <div class="controls">
-        <select id="categorySelect" onchange="changeCategoryMidGame()">
+        <select id="categorySelect" onchange="triggerFeedback('ui-click'); changeCategoryMidGame()">
             <option value="General">General</option>
             <option value="Science">Science</option>
             <option value="Chemistry">Chemistry</option>
@@ -297,13 +295,11 @@
             <option value="Geopolitics">Geopolitics</option>
         </select>
         
-        <label class="toggle-label"><input type="checkbox" id="contrastToggle" onchange="toggleContrast()"> High Contrast</label>
-        
-        <label class="toggle-label"><input type="checkbox" id="soundToggle" checked> Sound</label>
+        <label class="toggle-label"><input type="checkbox" id="contrastToggle" onchange="toggleContrast(); triggerFeedback('ui-click');"> High Contrast</label>
 
-        <button class="action-btn" onclick="getHint()">💡 Hint</button>
-        <button id="shareBtn" class="action-btn btn-share" style="display:none;" onclick="shareResults()">📤 Share</button>
-        <button id="playAgainBtn" class="action-btn btn-restart" style="display:none;" onclick="returnToMenu()">🔄 Menu</button>
+        <button class="action-btn" onclick="triggerFeedback('ui-click'); getHint()">💡 Hint</button>
+        <button id="shareBtn" class="action-btn btn-share" style="display:none;" onclick="triggerFeedback('ui-click'); shareResults()">📤 Share</button>
+        <button id="playAgainBtn" class="action-btn btn-restart" style="display:none;" onclick="triggerFeedback('ui-click'); returnToMenu()">🔄 Menu</button>
     </div>
 
     <div id="message"></div>
@@ -316,7 +312,7 @@
         </div>
     </div>
 
-    <div id="helpModal" class="modal" onclick="toggleModal('helpModal')">
+    <div id="helpModal" class="modal" onclick="triggerFeedback('ui-click'); toggleModal('helpModal')">
         <div class="modal-content" onclick="event.stopPropagation()">
             <h3>How To Play</h3>
             <p>Guess the word in exactly 6 tries. The category determines the theme!</p>
@@ -330,11 +326,11 @@
             <div class="example-row">
                 <div class="mini-tile absent">G</div> HOST — <b>Absent:</b> Not in the word.
             </div>
-            <button class="action-btn" onclick="toggleModal('helpModal')" style="margin-top:15px; width: 100%;">Close</button>
+            <button class="action-btn" onclick="triggerFeedback('ui-click'); toggleModal('helpModal')" style="margin-top:15px; width: 100%;">Close</button>
         </div>
     </div>
 
-    <div id="statsModal" class="modal" onclick="toggleModal('statsModal')">
+    <div id="statsModal" class="modal" onclick="triggerFeedback('ui-click'); toggleModal('statsModal')">
         <div class="modal-content" onclick="event.stopPropagation()">
             <h3 style="text-align: center; margin-top: 0;">STATISTICS</h3>
             <div class="stat-container">
@@ -345,11 +341,11 @@
             </div>
             <h4 style="margin-top: 20px; margin-bottom: 10px;">GUESS DISTRIBUTION</h4>
             <div id="guess-distribution"></div>
-            <button class="action-btn" onclick="toggleModal('statsModal')" style="margin-top:20px; width: 100%;">Close</button>
+            <button class="action-btn" onclick="triggerFeedback('ui-click'); toggleModal('statsModal')" style="margin-top:20px; width: 100%;">Close</button>
         </div>
     </div>
 
-    <div id="dictModal" class="modal" onclick="toggleModal('dictModal')">
+    <div id="dictModal" class="modal" onclick="triggerFeedback('ui-click'); toggleModal('dictModal')">
         <div class="modal-content" onclick="event.stopPropagation()">
             <h3 style="text-align: center; margin-top: 0;">CATEGORY EXAMPLES</h3>
             <p style="font-size: 0.85rem; color: #818384; text-align: center; margin-top: -10px;">A sneak peek at the types of words in each subject!</p>
@@ -365,46 +361,54 @@
                 <p><b>➗ Maths / JEE:</b> GRAPH, SLOPE, AXIOM...</p>
                 <p><b>🌐 Geopolitics:</b> TRADE, ALLYS, PEACE...</p>
             </div>
-            <button class="action-btn" onclick="toggleModal('dictModal')" style="margin-top:20px; width: 100%;">Close</button>
+            <button class="action-btn" onclick="triggerFeedback('ui-click'); toggleModal('dictModal')" style="margin-top:20px; width: 100%;">Close</button>
         </div>
     </div>
 
-    <div id="appShareModal" class="modal" onclick="toggleModal('appShareModal')">
+    <div id="appShareModal" class="modal" onclick="triggerFeedback('ui-click'); toggleModal('appShareModal')">
         <div class="modal-content" onclick="event.stopPropagation()">
             <h3 style="text-align: center; margin-top: 0; letter-spacing: 1px;">SHARE & DOWNLOAD</h3>
             <div style="margin: 25px 0;">
                 <label style="font-size: 0.8rem; font-weight: bold; color: var(--text); text-transform: uppercase;">1. Share Game Link</label>
                 <div style="display: flex; gap: 10px; margin-top: 8px;">
                     <input type="text" id="gameLinkInput" readonly style="flex: 1; padding: 10px; background: #121213; color: #85c0f9; border: 1px solid var(--border); border-radius: 4px; font-size: 0.9rem;">
-                    <button class="action-btn btn-share" onclick="copyGameLink()">Copy</button>
+                    <button class="action-btn btn-share" onclick="triggerFeedback('ui-click'); copyGameLink()">Copy</button>
                 </div>
             </div>
             <hr style="border: 0.5px solid var(--border); margin: 20px 0;">
             <div style="text-align: center; margin-bottom: 10px;">
                 <label style="font-size: 0.8rem; font-weight: bold; color: var(--text); text-transform: uppercase; display: block; text-align: left; margin-bottom: 8px;">2. Download to Device</label>
-                <button class="action-btn btn-download" style="width: 100%; padding: 12px; font-size: 1rem;" onclick="downloadGameOffline()">💾 Download Offline Game</button>
+                <button class="action-btn btn-download" style="width: 100%; padding: 12px; font-size: 1rem;" onclick="triggerFeedback('ui-click'); downloadGameOffline()">💾 Download Offline Game</button>
             </div>
-            <button class="action-btn" onclick="toggleModal('appShareModal')" style="margin-top:15px; width: 100%;">Close</button>
+            <button class="action-btn" onclick="triggerFeedback('ui-click'); toggleModal('appShareModal')" style="margin-top:15px; width: 100%;">Close</button>
         </div>
     </div>
 
-    <div id="timeHintModal" class="modal" onclick="toggleModal('timeHintModal')">
+    <div id="timeHintModal" class="modal" onclick="triggerFeedback('ui-click'); toggleModal('timeHintModal')">
         <div class="modal-content" style="text-align: center;" onclick="event.stopPropagation()">
             <h3 style="margin-top: 0;">Need a hand? ⏱️</h3>
             <p style="color: #cccccc;">You've been thinking for 5 minutes! Would you like me to reveal the first letter?</p>
             <div style="display: flex; gap: 10px; margin-top: 25px; justify-content: center;">
-                <button class="action-btn btn-share" onclick="acceptTimeHint()">Yes, please!</button>
-                <button class="action-btn" onclick="toggleModal('timeHintModal')">No, I got this</button>
+                <button class="action-btn btn-share" onclick="triggerFeedback('ui-click'); acceptTimeHint()">Yes, please!</button>
+                <button class="action-btn" onclick="triggerFeedback('ui-click'); toggleModal('timeHintModal')">No, I got this</button>
             </div>
         </div>
     </div>
 
     <script>
-        // --- WEB AUDIO API SYNTHESIZER ---
+        // --- SMOOTH WEB AUDIO API SYNTHESIZER ---
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let isMuted = false;
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            const btn = document.getElementById('muteBtn');
+            btn.textContent = isMuted ? "🔇" : "🔊";
+            if (!isMuted) triggerFeedback('ui-click'); // Play sound to confirm it's on
+        }
 
         function playSound(type) {
-            if (!document.getElementById('soundToggle').checked) return; // Respect mute button
+            if (isMuted) return; 
             if (audioCtx.state === 'suspended') audioCtx.resume();
             
             const oscillator = audioCtx.createOscillator();
@@ -414,38 +418,62 @@
             gainNode.connect(audioCtx.destination);
             const now = audioCtx.currentTime;
             
+            // Fade in from 0 to prevent sharp "pops" in the speaker
+            gainNode.gain.setValueAtTime(0, now);
+            
             if (type === 'tap') {
+                // Soft keyboard tap (low frequency sine)
                 oscillator.type = 'sine';
-                oscillator.frequency.setValueAtTime(800, now);
-                oscillator.frequency.exponentialRampToValueAtTime(300, now + 0.05);
-                gainNode.gain.setValueAtTime(0.3, now);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                oscillator.frequency.setValueAtTime(350, now);
+                oscillator.frequency.exponentialRampToValueAtTime(200, now + 0.1);
+                gainNode.gain.linearRampToValueAtTime(0.1, now + 0.01);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
                 oscillator.start(now);
-                oscillator.stop(now + 0.05);
+                oscillator.stop(now + 0.1);
+            } else if (type === 'hover') {
+                // Gentle bubble ping
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(700, now);
+                gainNode.gain.linearRampToValueAtTime(0.015, now + 0.01); // VERY quiet
+                gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+                oscillator.start(now);
+                oscillator.stop(now + 0.1);
+            } else if (type === 'ui-click') {
+                // Smooth menu selection thud
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(500, now);
+                gainNode.gain.linearRampToValueAtTime(0.05, now + 0.01);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+                oscillator.start(now);
+                oscillator.stop(now + 0.1);
             } else if (type === 'error') {
-                oscillator.type = 'sawtooth';
-                oscillator.frequency.setValueAtTime(150, now);
-                gainNode.gain.setValueAtTime(0.2, now);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                // Soft low "dun" instead of harsh buzz
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(180, now);
+                oscillator.frequency.exponentialRampToValueAtTime(100, now + 0.2);
+                gainNode.gain.linearRampToValueAtTime(0.15, now + 0.02);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
                 oscillator.start(now);
                 oscillator.stop(now + 0.2);
             } else if (type === 'win') {
-                oscillator.type = 'triangle';
-                oscillator.frequency.setValueAtTime(440, now); 
-                oscillator.frequency.setValueAtTime(554.37, now + 0.1); 
-                oscillator.frequency.setValueAtTime(659.25, now + 0.2); 
-                oscillator.frequency.setValueAtTime(880, now + 0.3); 
-                gainNode.gain.setValueAtTime(0.2, now);
-                gainNode.gain.linearRampToValueAtTime(0, now + 0.6);
+                // Soft, rounded victory chime
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(523.25, now);       // C5
+                oscillator.frequency.setValueAtTime(659.25, now + 0.1); // E5
+                oscillator.frequency.setValueAtTime(783.99, now + 0.2); // G5
+                oscillator.frequency.setValueAtTime(1046.50, now + 0.3); // C6
+                
+                gainNode.gain.linearRampToValueAtTime(0.1, now + 0.02);
+                gainNode.gain.linearRampToValueAtTime(0.0, now + 0.7);
                 oscillator.start(now);
-                oscillator.stop(now + 0.6);
+                oscillator.stop(now + 0.7);
             }
         }
 
         function triggerFeedback(type) {
             playSound(type);
-            if (!('vibrate' in navigator)) return;
-            if (type === 'tap') navigator.vibrate(15);
+            if (!('vibrate' in navigator) || isMuted) return;
+            if (type === 'tap' || type === 'ui-click') navigator.vibrate(15);
             else if (type === 'error') navigator.vibrate([30, 50, 30]);
             else if (type === 'win') navigator.vibrate([50, 100, 50, 100, 50]); 
         }
