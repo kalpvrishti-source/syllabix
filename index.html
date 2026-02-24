@@ -198,48 +198,31 @@
         .mini-tile { width: 30px; height: 30px; border: 1px solid var(--border); display: flex; justify-content: center; align-items: center; font-weight: bold; }
 
         /* Stats Chart */
-        .stat-container { display: flex; justify-content: space-around; margin-bottom: 20px; text-align: center; }
-        .stat-box { display: flex; flex-direction: column; }
-        .stat-num { font-size: 2rem; font-weight: bold; }
-        .stat-label { font-size: 0.75rem; color: #818384; }
+        .stat-container { display: flex; justify-content: space-around; margin-bottom: 20px; text-align: center; gap: 10px;}
+        .stat-box { display: flex; flex-direction: column; align-items: center; }
+        .stat-num { font-size: 1.8rem; font-weight: bold; }
+        .stat-label { font-size: 0.70rem; color: #818384; text-transform: uppercase; }
         .graph-row { display: flex; align-items: center; margin-bottom: 5px; font-size: 0.9rem; font-weight: bold;}
         .graph-num { width: 15px; }
         .graph-bar { background-color: #3a3a3c; height: 20px; margin-left: 10px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; min-width: 20px; }
         .graph-bar.highlight { background-color: var(--correct); }
-
-        /* Category Dictionary Styles */
-        .dict-list { max-height: 250px; overflow-y: auto; text-align: left; font-size: 0.95rem; padding: 10px; border-radius: 5px; background: #121213; border: 1px solid var(--border); }
-        .dict-list p { margin: 8px 0; border-bottom: 1px solid #3a3a3c; padding-bottom: 5px; }
-        .dict-list p:last-child { border-bottom: none; }
 
         /* UI Controls */
         .controls { display: flex; gap: 15px; margin: 15px 0; align-items: center; font-size: 0.85rem; flex-wrap: wrap; justify-content: center;}
         #message { height: 30px; color: #ffd700; font-weight: bold; margin: 5px; text-align: center; font-size: 1.2rem;}
         .error-msg { color: #ff5252 !important; }
         
-        .action-btn { 
-            background-color: #565758; color: white; border: 0; 
-            padding: 8px 15px; border-radius: 4px; cursor: pointer; 
-            font-weight: bold; transition: opacity 0.2s; font-size: 0.9rem;
-        }
-        .action-btn:active { opacity: 0.7; }
+        .action-btn { background-color: #565758; color: white; border: 0; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: opacity 0.2s; font-size: 0.9rem;}
         .btn-share { background-color: var(--correct); }
         .btn-restart { background-color: #1976d2; }
-        .btn-yes { background-color: var(--correct); }
         .btn-download { background-color: #f5793a; }
         
-        select {
-            background-color: #565758; color: white; border: 0; 
-            padding: 8px 10px; border-radius: 4px; font-weight: bold; cursor: pointer; 
-            font-size: 0.9rem; font-family: inherit; outline: none;
-        }
-
+        select { background-color: #565758; color: white; border: 0; padding: 8px 10px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.9rem; font-family: inherit; outline: none; }
         .toggle-label { display: flex; align-items: center; gap: 5px; cursor: pointer; }
 
         /* Animations */
         .flip { animation: flip 0.6s forwards; }
         @keyframes flip { 50% { transform: rotateX(90deg); } 100% { transform: rotateX(0deg); } }
-        
         .shake { animation: shake 0.4s; }
         @keyframes shake {
             10%, 90% { transform: translate3d(-2px, 0, 0); }
@@ -283,7 +266,6 @@
         <div class="header-left">
             <button class="icon-btn" onclick="toggleModal('helpModal')" title="How to play">?</button>
             <button class="icon-btn" onclick="openStats()" title="Statistics">📊</button>
-            <button class="icon-btn" onclick="toggleModal('dictModal')" title="Word Examples">📚</button>
             <button class="icon-btn" onclick="openShareAppMenu()" title="Share or Download Game">📥</button>
         </div>
         <h1>SYLLABIX</h1>
@@ -306,9 +288,10 @@
             <option value="Geopolitics">Geopolitics</option>
         </select>
         
-        <label class="toggle-label"><input type="checkbox" id="hardMode"> Hard Mode</label>
         <label class="toggle-label"><input type="checkbox" id="contrastToggle" onchange="toggleContrast()"> High Contrast</label>
         
+        <label class="toggle-label"><input type="checkbox" id="soundToggle" checked> Sound</label>
+
         <button class="action-btn" onclick="getHint()">💡 Hint</button>
         <button id="shareBtn" class="action-btn btn-share" style="display:none;" onclick="shareResults()">📤 Share</button>
         <button id="playAgainBtn" class="action-btn btn-restart" style="display:none;" onclick="returnToMenu()">🔄 Menu</button>
@@ -318,7 +301,6 @@
 
     <div class="game-wrapper">
         <div id="game-container"></div>
-        
         <div class="tracker-board">
             <div class="tracker-title">Letter Tracker</div>
             <div id="tracker-keyboard"></div> 
@@ -349,30 +331,31 @@
             <div class="stat-container">
                 <div class="stat-box"><span class="stat-num" id="stat-played">0</span><span class="stat-label">Played</span></div>
                 <div class="stat-box"><span class="stat-num" id="stat-winpct">0</span><span class="stat-label">Win %</span></div>
+                <div class="stat-box"><span class="stat-num" id="stat-streak" style="color: #f5793a;">0</span><span class="stat-label">🔥 Streak</span></div>
+                <div class="stat-box"><span class="stat-num" id="stat-maxstreak">0</span><span class="stat-label">👑 Best</span></div>
             </div>
-            <h4>GUESS DISTRIBUTION</h4>
+            <h4 style="margin-top: 20px; margin-bottom: 10px;">GUESS DISTRIBUTION</h4>
             <div id="guess-distribution"></div>
             <button class="action-btn" onclick="toggleModal('statsModal')" style="margin-top:20px; width: 100%;">Close</button>
         </div>
     </div>
 
-    <div id="dictModal" class="modal" onclick="toggleModal('dictModal')">
+    <div id="appShareModal" class="modal" onclick="toggleModal('appShareModal')">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <h3 style="text-align: center; margin-top: 0;">CATEGORY EXAMPLES</h3>
-            <p style="font-size: 0.85rem; color: #818384; text-align: center; margin-top: -10px;">A sneak peek at the types of words in each subject!</p>
-            <div class="dict-list">
-                <p><b>🌍 General:</b> SMART, BOARD, CLOCK...</p>
-                <p><b>🔭 Science:</b> ATOMS, FORCE, LASER...</p>
-                <p><b>🧪 Chemistry:</b> AMINE, OZONE, MOLAR...</p>
-                <p><b>🧬 Biology:</b> CELLS, BRAIN, VIRUS...</p>
-                <p><b>🦁 Zoology:</b> TIGER, WHALE, EAGLE...</p>
-                <p><b>🪐 Astronomy:</b> MARS, COMET, ORBIT...</p>
-                <p><b>🏛️ History:</b> INDUS, RUINS, MYTHS...</p>
-                <p><b>🎵 Music Tech:</b> AUDIO, MIXER, TEMPO...</p>
-                <p><b>➗ Maths / JEE:</b> GRAPH, SLOPE, AXIOM...</p>
-                <p><b>🌐 Geopolitics:</b> TRADE, ALLYS, PEACE...</p>
+            <h3 style="text-align: center; margin-top: 0; letter-spacing: 1px;">SHARE & DOWNLOAD</h3>
+            <div style="margin: 25px 0;">
+                <label style="font-size: 0.8rem; font-weight: bold; color: var(--text); text-transform: uppercase;">1. Share Game Link</label>
+                <div style="display: flex; gap: 10px; margin-top: 8px;">
+                    <input type="text" id="gameLinkInput" readonly style="flex: 1; padding: 10px; background: #121213; color: #85c0f9; border: 1px solid var(--border); border-radius: 4px; font-size: 0.9rem;">
+                    <button class="action-btn btn-share" onclick="copyGameLink()">Copy</button>
+                </div>
             </div>
-            <button class="action-btn" onclick="toggleModal('dictModal')" style="margin-top:20px; width: 100%;">Close</button>
+            <hr style="border: 0.5px solid var(--border); margin: 20px 0;">
+            <div style="text-align: center; margin-bottom: 10px;">
+                <label style="font-size: 0.8rem; font-weight: bold; color: var(--text); text-transform: uppercase; display: block; text-align: left; margin-bottom: 8px;">2. Download to Device</label>
+                <button class="action-btn btn-download" style="width: 100%; padding: 12px; font-size: 1rem;" onclick="downloadGameOffline()">💾 Download Offline Game</button>
+            </div>
+            <button class="action-btn" onclick="toggleModal('appShareModal')" style="margin-top:15px; width: 100%;">Close</button>
         </div>
     </div>
 
@@ -381,60 +364,82 @@
             <h3 style="margin-top: 0;">Need a hand? ⏱️</h3>
             <p style="color: #cccccc;">You've been thinking for 5 minutes! Would you like me to reveal the first letter?</p>
             <div style="display: flex; gap: 10px; margin-top: 25px; justify-content: center;">
-                <button class="action-btn btn-yes" onclick="acceptTimeHint()">Yes, please!</button>
+                <button class="action-btn btn-share" onclick="acceptTimeHint()">Yes, please!</button>
                 <button class="action-btn" onclick="toggleModal('timeHintModal')">No, I got this</button>
             </div>
         </div>
     </div>
 
-    <div id="appShareModal" class="modal" onclick="toggleModal('appShareModal')">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <h3 style="text-align: center; margin-top: 0; letter-spacing: 1px;">SHARE & DOWNLOAD</h3>
-            <p style="font-size: 0.85rem; color: #818384; text-align: center; margin-top: -10px;">Send to friends or keep it forever!</p>
-            
-            <div style="margin: 25px 0;">
-                <label style="font-size: 0.8rem; font-weight: bold; color: var(--text); text-transform: uppercase;">1. Share Game Link</label>
-                <div style="display: flex; gap: 10px; margin-top: 8px;">
-                    <input type="text" id="gameLinkInput" readonly style="flex: 1; padding: 10px; background: #121213; color: #85c0f9; border: 1px solid var(--border); border-radius: 4px; font-size: 0.9rem;">
-                    <button class="action-btn btn-share" onclick="copyGameLink()">Copy</button>
-                </div>
-            </div>
-
-            <hr style="border: 0.5px solid var(--border); margin: 20px 0;">
-
-            <div style="text-align: center; margin-bottom: 10px;">
-                <label style="font-size: 0.8rem; font-weight: bold; color: var(--text); text-transform: uppercase; display: block; text-align: left; margin-bottom: 8px;">2. Download to Device</label>
-                <button class="action-btn btn-download" style="width: 100%; padding: 12px; font-size: 1rem;" onclick="downloadGameOffline()">💾 Download Offline Game</button>
-                <p style="font-size: 0.75rem; color: #818384; margin-top: 10px;">This downloads Syllabix directly to your phone or PC. You can open the file anytime to play without internet!</p>
-            </div>
-
-            <button class="action-btn" onclick="toggleModal('appShareModal')" style="margin-top:15px; width: 100%;">Close</button>
-        </div>
-    </div>
-
     <script>
-        // 1. App Startup Flow
+        // --- NEW: WEB AUDIO API SYNTHESIZER ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            if (!document.getElementById('soundToggle').checked) return; // Respect mute button
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            const now = audioCtx.currentTime;
+            
+            if (type === 'tap') {
+                // High, short mechanical tick
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(800, now);
+                oscillator.frequency.exponentialRampToValueAtTime(300, now + 0.05);
+                gainNode.gain.setValueAtTime(0.3, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                oscillator.start(now);
+                oscillator.stop(now + 0.05);
+            } else if (type === 'error') {
+                // Low buzzer
+                oscillator.type = 'sawtooth';
+                oscillator.frequency.setValueAtTime(150, now);
+                gainNode.gain.setValueAtTime(0.2, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                oscillator.start(now);
+                oscillator.stop(now + 0.2);
+            } else if (type === 'win') {
+                // Cheerful 4-note chime
+                oscillator.type = 'triangle';
+                oscillator.frequency.setValueAtTime(440, now); // A4
+                oscillator.frequency.setValueAtTime(554.37, now + 0.1); // C#5
+                oscillator.frequency.setValueAtTime(659.25, now + 0.2); // E5
+                oscillator.frequency.setValueAtTime(880, now + 0.3); // A5
+                gainNode.gain.setValueAtTime(0.2, now);
+                gainNode.gain.linearRampToValueAtTime(0, now + 0.6);
+                oscillator.start(now);
+                oscillator.stop(now + 0.6);
+            }
+        }
+
+        // Trigger Audio & Physical Vibration
+        function triggerFeedback(type) {
+            playSound(type);
+            if (!('vibrate' in navigator)) return;
+            if (type === 'tap') navigator.vibrate(15);
+            else if (type === 'error') navigator.vibrate([30, 50, 30]);
+            else if (type === 'win') navigator.vibrate([50, 100, 50, 100, 50]); 
+        }
+
         window.addEventListener('load', () => {
             initBoardAndKeyboard(); 
-            
             const splash = document.getElementById('splash-screen');
             setTimeout(() => {
                 splash.style.opacity = '0';
-                setTimeout(() => {
-                    splash.style.display = 'none';
-                }, 600);
+                setTimeout(() => { splash.style.display = 'none'; }, 600);
             }, 2500);
         });
 
-        // Reload Warning Safeguard
         window.addEventListener('beforeunload', function (e) {
             if ((currentRow > 0 || currentCol > 0) && !gameOver) {
-                e.preventDefault();
-                e.returnValue = '';
+                e.preventDefault(); e.returnValue = '';
             }
         });
 
-        // 2. Dictionary Setup (Now with 1,500+ Words!)
         const CATEGORIES = {
             "General": ["REACT", "APPLE", "SMART", "WORLD", "GHOST", "CHESS", "BOARD", "HOUSE", "WATER", "MONEY", "PAPER", "CLOCK", "TRAIN", "GLASS", "CHAIR", "TABLE"],
             "Science": ["ATOMS", "FORCE", "LASER", "FLUID", "SOLID", "PHASE", "LIGHT", "SOUND", "POWER", "PRISM", "OPTIC", "WAVES", "SCALE", "QUARK"],
@@ -449,15 +454,8 @@
         };
 
         const COMMON_WORDS_STRING = "ABOUT,ABOVE,ABUSE,ACTOR,ACUTE,ADAPT,ADMIT,ADOPT,ADULT,AFTER,AGAIN,AGENT,AGREE,AHEAD,ALARM,ALBUM,ALERT,ALIEN,ALIGN,ALIKE,ALIVE,ALLOW,ALONE,ALONG,ALTER,AMONG,ANGER,ANGLE,ANGRY,APPLE,APPLY,ARENA,ARGUE,ARISE,ARRAY,ARROW,ASIAN,ASIDE,ASSET,AUDIO,AUDIT,AVOID,AWAKE,AWARD,AWARE,AWFUL,BACON,BAKER,BASIC,BASIN,BASIS,BATCH,BEACH,BEARD,BEAST,BEGIN,BEING,BELOW,BENCH,BILLY,BIRTH,BLACK,BLADE,BLAME,BLANK,BLIND,BLOCK,BLOOD,BOARD,BOAST,BONUS,BOOST,BOOTH,BOUND,BRAIN,BRAKE,BRAND,BREAD,BREAK,BREED,BRICK,BRIDE,BRIEF,BRING,BROAD,BROKE,BROWN,BRUSH,BUILD,BUILT,BUYER,CABIN,CABLE,CATCH,CAUSE,CHAIN,CHAIR,CHART,CHASE,CHEAP,CHECK,CHEEK,CHEER,CHESS,CHEST,CHIEF,CHILD,CHINA,CHOIR,CHOSE,CIVIC,CIVIL,CLAIM,CLASS,CLEAN,CLEAR,CLERK,CLICK,CLOCK,CLOSE,COACH,COAST,COLON,COLOR,COMIC,CORAL,COTTON,COUCH,COULD,COUNT,COURT,COVER,CRACK,CRAFT,CRASH,CRAZY,CREAM,CRIME,CROSS,CROWD,CROWN,CRUEL,CURVE,CYCLE,DAILY,DANCE,DATED,DEALT,DEATH,DEBUT,DELAY,DEPTH,DEVIL,DIARY,DIGIT,DIRTY,DISCO,DITCH,DONOR,DOUBT,DRAFT,DRAMA,DRAWN,DREAM,DRESS,DRILL,DRINK,DRIVE,DRUNK,EAGER,EAGLE,EARLY,EARTH,EIGHT,ELITE,EMPTY,ENEMY,ENJOY,ENTER,ENTRY,EQUAL,ERROR,ESSAY,EVENT,EVERY,EXACT,EXIST,EXTRA,FAITH,FALSE,FAULT,FIBER,FIELD,FIFTH,FIFTY,FIGHT,FINAL,FIRST,FIXED,FLASH,FLEET,FLESH,FLIGHT,FLOOR,FLOUR,FLUID,FOCUS,FORCE,FORTH,FORTY,FORUM,FOUND,FRAME,FRAUD,FRESH,FRONT,FRUIT,FULLY,FUNNY,GIANT,GIVEN,GLASS,GLOBE,GLORY,GOING,GRACE,GRADE,GRAND,GRANT,GRASS,GREAT,GREEN,GROSS,GROUP,GROWN,GUARD,GUESS,GUEST,GUIDE,HABIT,HAPPY,HARSH,HEART,HEAVY,HELLO,HENCE,HORSE,HOTEL,HOUSE,HUMAN,IDEAL,IMAGE,INDEX,INNER,INPUT,ISSUE,JOINT,JUDGE,JUICE,KNOWN,LABEL,LABOR,LARGE,LATER,LAUGH,LAYER,LEARN,LEASE,LEAST,LEAVE,LEGAL,LEMON,LEVEL,LIGHT,LIMIT,LINEN,LOCAL,LOGIC,LOOSE,LOWER,LUCKY,LUNCH,MAGIC,MAJOR,MAKER,MARCH,MARRY,MATCH,MAYBE,MAYOR,MEANT,MEDIA,MERIT,METAL,METER,MIGHT,MINOR,MINUS,MIXED,MODEL,MONEY,MONTH,MORAL,MOTOR,MOUNT,MOUSE,MOUTH,MOVIE,MUSIC,NEEDS,NEVER,NEWLY,NIGHT,NOISE,NORTH,NOVEL,NURSE,OCCUR,OCEAN,OFFER,OFTEN,ONION,ORDER,ORGAN,OTHER,OUGHT,OUNCE,OUTER,OWNER,PANEL,PAPER,PARTY,PATCH,PEACE,PHASE,PHONE,PHOTO,PIANO,PIECE,PILOT,PITCH,PLACE,PLAIN,PLANE,PLANT,PLATE,POINT,POUND,POWER,PRESS,PRICE,PRIDE,PRIME,PRINT,PRIOR,PRIZE,PROOF,PROUD,PROVE,QUEEN,QUICK,QUIET,QUITE,RADIO,RAISE,RANGE,RAPID,RATIO,REACH,REACT,READY,REALM,REBEL,REFER,RELAX,RELAY,REPLY,RIGHT,RIVER,ROMAN,ROUGH,ROUND,ROUTE,ROYAL,RURAL,SCALE,SCENE,SCOPE,SCORE,SENSE,SERVE,SETUP,SEVEN,SHALL,SHAPE,SHARE,SHARP,SHEET,SHELF,SHELL,SHIFT,SHIRT,SHOCK,SHOOT,SHORT,SHOWN,SIGHT,SINCE,SIXTH,SIXTY,SKILL,SLEEP,SLIDE,SMALL,SMART,SMILE,SMITH,SMOKE,SOLID,SOLVE,SORRY,SOUND,SOUTH,SPACE,SPARE,SPEAK,SPEED,SPELL,SPEND,SPENT,SPLIT,SPOKE,SPORT,STAFF,STAGE,STAND,START,STATE,STEAM,STEEL,STICK,STILL,STOCK,STONE,STOOD,STORE,STORM,STORY,STRIP,STUCK,STUDY,STUFF,STYLE,SUGAR,SUPER,SWEET,TABLE,TAKEN,TASTE,TAXES,TEACH,TEETH,TENTH,TEXAS,THANK,THEFT,THEIR,THEME,THERE,THESE,THICK,THIEF,THING,THINK,THIRD,THOSE,THREE,THREW,THROW,TIGER,TIGHT,TIMES,TITLE,TODAY,TOPIC,TOTAL,TOUCH,TOUGH,TOWER,TRACK,TRADE,TRAIN,TREAT,TREND,TRIAL,TRIBE,TRICK,TRUCK,TRULY,TRUST,TRUTH,TWICE,UNDER,UNION,UNITY,UNTIL,UPPER,UPSET,URBAN,USAGE,USUAL,VALID,VALUE,VIDEO,VIRUS,VISIT,VITAL,VOICE,VOTER,WAGON,WASTE,WATCH,WATER,WHEEL,WHERE,WHICH,WHILE,WHITE,WHOLE,WHOSE,WOMAN,WOMEN,WORDS,WORLD,WORRY,WORSE,WORST,WORTH,WOULD,WOUND,WRITE,WRONG,YIELD,YOUNG,YOUTH";
-        
-        const VALID_GUESSES = [
-            ...new Set([
-                ...Object.values(CATEGORIES).flat(),
-                ...COMMON_WORDS_STRING.split(",")
-            ])
-        ];
+        const VALID_GUESSES = [...new Set([...Object.values(CATEGORIES).flat(), ...COMMON_WORDS_STRING.split(",")])];
 
-        // 3. Game State Variables
         let currentCategory = "General";
         let targetWord = "";
         let currentRow = 0, currentCol = 0, gameOver = false, startTime, timerInt;
@@ -465,19 +463,19 @@
         let boardEmoji = [];
         let letterStates = {}; 
         let timeHintOffered = false;
-        let stats = JSON.parse(localStorage.getItem('wordle-stats')) || { played: 0, won: 0, guesses: {1:0, 2:0, 3:0, 4:0, 5:0, 6:0} };
-
-        // 4. Initialization & Game Flow Functions
         
+        let stats = JSON.parse(localStorage.getItem('syllabix-stats-v2')) || { played: 0, won: 0, currentStreak: 0, maxStreak: 0, guesses: {1:0, 2:0, 3:0, 4:0, 5:0, 6:0} };
+
         function startGame(category) {
+            // First interaction unlocks AudioContext in browsers
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
             currentCategory = category;
             document.getElementById('categorySelect').value = category; 
-            
             const catScreen = document.getElementById('category-screen');
             catScreen.style.opacity = '0';
             catScreen.style.transform = 'translateY(-20px)';
             setTimeout(() => { catScreen.style.display = 'none'; }, 500);
-            
             resetGame(); 
         }
 
@@ -520,7 +518,13 @@
                 const rowEl = document.createElement('div'); rowEl.className = 'tk-row';
                 row.forEach(key => {
                     const keyEl = document.createElement('div'); keyEl.className = 'tk-key';
-                    keyEl.id = `tk-${key}`; keyEl.textContent = key; rowEl.appendChild(keyEl);
+                    keyEl.id = `tk-${key}`; keyEl.textContent = key;
+                    // Trigger sound/haptic when touching on-screen keys
+                    keyEl.addEventListener('click', () => {
+                        triggerFeedback('tap');
+                        handleInput(key);
+                    });
+                    rowEl.appendChild(keyEl);
                 });
                 tracker.appendChild(rowEl);
                 if (index < QWERTY.length - 1) tracker.appendChild(document.createElement('br'));
@@ -536,7 +540,6 @@
                 const m = Math.floor(diff / 60).toString().padStart(2, '0');
                 const s = (diff % 60).toString().padStart(2, '0');
                 document.getElementById('timer').textContent = `${m}:${s}`;
-
                 if (diff >= 300 && !timeHintOffered && !gameOver) {
                     timeHintOffered = true;
                     toggleModal('timeHintModal');
@@ -552,20 +555,16 @@
             for(let i=0; i<6; i++) {
                 for(let j=0; j<5; j++) {
                     const t = document.getElementById(`tile-${i}-${j}`);
-                    t.textContent = "";
-                    t.className = 'tile'; 
+                    t.textContent = ""; t.className = 'tile'; 
                 }
             }
             document.querySelectorAll('.tk-key').forEach(k => k.className = 'tk-key');
-
             document.getElementById('timer').textContent = "00:00";
             document.getElementById('shareBtn').style.display = "none";
             document.getElementById('playAgainBtn').style.display = "none";
-            showMsg(""); 
-            startTimer(); 
+            showMsg(""); startTimer(); 
         }
 
-        // 5. Input & Core Logic
         function handleInput(k) {
             if(gameOver || document.getElementById('category-screen').style.display !== 'none') return;
             
@@ -574,6 +573,7 @@
             } else if(k === 'Enter') {
                 if (currentCol === 5) submitGuess();
                 else {
+                    triggerFeedback('error');
                     shakeRow(); showMsg("Not enough letters");
                     setTimeout(() => { if(!gameOver && document.getElementById('message').textContent === "Not enough letters") showMsg(""); }, 1500);
                 }
@@ -612,6 +612,7 @@
             const guess = guesses[currentRow];
             
             if (!VALID_GUESSES.includes(guess)) {
+                triggerFeedback('error');
                 shakeRow(); showMsg("Not in word list");
                 setTimeout(() => { if(!gameOver && document.getElementById('message').textContent === "Not in word list") showMsg(""); }, 1500);
                 return; 
@@ -627,6 +628,7 @@
                 
                 await new Promise(r => setTimeout(r, 150));
                 t.classList.add('flip');
+                triggerFeedback('tap'); // Small tick as each card flips
                 
                 if(char === targetWord[i]) { 
                     t.classList.add('correct'); rowEmoji += document.getElementById('contrastToggle').checked ? "🟧" : "🟩"; status = "correct";
@@ -641,12 +643,14 @@
 
             if(guess === targetWord) {
                 clearInterval(timerInt);
+                triggerFeedback('win');
                 showMsg("Impressive! 🎉");
                 fireConfetti();
                 saveStats(true);
                 showEndgameButtons();
             } else if(currentRow === 5) {
                 clearInterval(timerInt);
+                triggerFeedback('error');
                 showMsg(`You used all attempts! Word: ${targetWord}`, true);
                 saveStats(false);
                 showEndgameButtons();
@@ -655,7 +659,6 @@
             }
         }
 
-        // 6. Extras (Hints, Modals, Stats, Sharing)
         function getHint() {
             if(gameOver) return;
             let foundLetters = [];
@@ -678,23 +681,26 @@
             setTimeout(() => { if(!gameOver && document.getElementById('message').textContent.includes('first letter is')) showMsg(""); }, 4000);
         }
 
-        function fireConfetti() {
-            confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, zIndex: 1000 });
-        }
+        function fireConfetti() { confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, zIndex: 1000 }); }
 
         function saveStats(won) {
             stats.played++;
             if (won) {
                 stats.won++;
+                stats.currentStreak++;
+                if (stats.currentStreak > stats.maxStreak) stats.maxStreak = stats.currentStreak;
                 stats.guesses[currentRow + 1]++;
+            } else {
+                stats.currentStreak = 0;
             }
-            localStorage.setItem('wordle-stats', JSON.stringify(stats));
+            localStorage.setItem('syllabix-stats-v2', JSON.stringify(stats));
         }
 
         function openStats() {
             document.getElementById('stat-played').textContent = stats.played;
-            const winPct = stats.played === 0 ? 0 : Math.round((stats.won / stats.played) * 100);
-            document.getElementById('stat-winpct').textContent = winPct;
+            document.getElementById('stat-winpct').textContent = stats.played === 0 ? 0 : Math.round((stats.won / stats.played) * 100);
+            document.getElementById('stat-streak').textContent = stats.currentStreak || 0;
+            document.getElementById('stat-maxstreak').textContent = stats.maxStreak || 0;
 
             const distContainer = document.getElementById('guess-distribution');
             distContainer.innerHTML = '';
@@ -705,7 +711,6 @@
             for (let i = 1; i <= 6; i++) {
                 const val = stats.guesses[i];
                 const widthPct = Math.max(7, (val / maxGuesses) * 100); 
-                
                 const row = document.createElement('div'); row.className = 'graph-row';
                 const num = document.createElement('div'); num.className = 'graph-num'; num.textContent = i;
                 const bar = document.createElement('div'); bar.className = 'graph-bar'; 
@@ -714,7 +719,6 @@
                 if (gameOver && val > 0 && currentRow + 1 === i && guesses[currentRow] === targetWord) {
                     bar.classList.add('highlight');
                 }
-                
                 row.appendChild(num); row.appendChild(bar);
                 distContainer.appendChild(row);
             }
@@ -745,19 +749,15 @@
         }
 
         function shareResults() {
-            const text = `Syllabix [${currentCategory}] ${currentRow === 6 && guesses[5] !== targetWord ? 'X' : currentRow + 1}/6 (${document.getElementById('timer').textContent})\n\n${boardEmoji.join('\n')}`;
+            const text = `Syllabix [${currentCategory}] ${currentRow === 6 && guesses[5] !== targetWord ? 'X' : currentRow + 1}/6 (${document.getElementById('timer').textContent})\n🔥 Streak: ${stats.currentStreak}\n\n${boardEmoji.join('\n')}`;
             navigator.clipboard.writeText(text);
             showMsg("Results copied to clipboard!");
             setTimeout(() => { if(document.getElementById('message').textContent === "Results copied to clipboard!") showMsg(""); }, 2000);
         }
 
-        // NEW: App Share & Download Functions
         function openShareAppMenu() {
-            // Automatically grab the live website URL (or show a placeholder if they are offline)
             let currentUrl = window.location.href;
-            if (currentUrl.includes("file://") || currentUrl.includes("C:/")) {
-                currentUrl = "https://your-github-username.github.io/syllabix/"; // Fallback for offline testing
-            }
+            if (currentUrl.includes("file://") || currentUrl.includes("C:/")) currentUrl = "https://your-github-username.github.io/syllabix/"; 
             document.getElementById('gameLinkInput').value = currentUrl;
             toggleModal('appShareModal');
         }
@@ -771,27 +771,25 @@
         }
 
         function downloadGameOffline() {
-            // Packages the entire HTML document into a downloadable file
             const htmlContent = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
             const blob = new Blob([htmlContent], { type: "text/html" });
             const url = URL.createObjectURL(blob);
-            
             const a = document.createElement('a');
             a.href = url;
-            a.download = "Syllabix_Game.html"; // The name of the file they will download
-            
+            a.download = "Syllabix_Game.html"; 
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            
             showMsg("Download started!");
             setTimeout(() => { if(document.getElementById('message').textContent === "Download started!") showMsg(""); }, 2000);
-            toggleModal('appShareModal'); // Close the menu
+            toggleModal('appShareModal'); 
         }
 
         window.addEventListener('keydown', e => {
             if(e.ctrlKey || e.metaKey || e.altKey) return;
+            // Physical keyboard trigger
+            if(/^[a-zA-Z]$/.test(e.key) || e.key === 'Backspace' || e.key === 'Enter') triggerFeedback('tap');
             handleInput(e.key);
         });
         
