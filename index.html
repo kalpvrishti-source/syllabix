@@ -10,6 +10,7 @@
     <meta name="apple-mobile-web-app-title" content="Syllabix">
 
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
     <style>
         :root {
             --correct: #6aaa64; 
@@ -167,12 +168,12 @@
 
         .tracker-board { padding-top: 5px; }
         .tracker-title { font-size: 0.8rem; color: #818384; text-align: center; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;}
-        .tk-row { display: flex; justify-content: center; gap: 8px; }
+        .tk-row { display: flex; justify-content: center; gap: 8px; margin-bottom: 8px; }
         .tk-key {
             background-color: #818384; color: white; width: 35px; height: 45px; 
             display: flex; justify-content: center; align-items: center;
             border-radius: 5px; font-weight: bold; font-size: 1rem;
-            transition: background-color 0.4s; user-select: none; 
+            transition: background-color 0.4s; user-select: none; cursor: pointer;
         }
         
         .tk-correct { background-color: var(--correct) !important; }
@@ -194,9 +195,7 @@
             background-color: #1a1a1b; padding: 25px; border-radius: 8px;
             max-width: 400px; width: 90%; border: 1px solid var(--border);
         }
-        .example-row { display: flex; gap: 5px; margin: 10px 0; font-size: 0.9rem; align-items: center; }
-        .mini-tile { width: 30px; height: 30px; border: 1px solid var(--border); display: flex; justify-content: center; align-items: center; font-weight: bold; }
-
+        
         /* Stats Chart */
         .stat-container { display: flex; justify-content: space-around; margin-bottom: 20px; text-align: center; gap: 10px;}
         .stat-box { display: flex; flex-direction: column; align-items: center; }
@@ -213,14 +212,15 @@
         .dict-list p:last-child { border-bottom: none; }
 
         /* UI Controls */
-        .controls { display: flex; gap: 15px; margin: 15px 0; align-items: center; font-size: 0.85rem; flex-wrap: wrap; justify-content: center;}
+        .controls { display: flex; gap: 10px; margin: 15px 0; align-items: center; font-size: 0.85rem; flex-wrap: wrap; justify-content: center;}
         #message { height: 30px; color: #ffd700; font-weight: bold; margin: 5px; text-align: center; font-size: 1.2rem;}
         .error-msg { color: #ff5252 !important; }
         
-        .action-btn { background-color: #565758; color: white; border: 0; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: opacity 0.2s; font-size: 0.9rem;}
+        .action-btn { background-color: #565758; color: white; border: 0; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: opacity 0.2s; font-size: 0.9rem;}
         .btn-share { background-color: var(--correct); }
         .btn-restart { background-color: #1976d2; }
         .btn-download { background-color: #f5793a; }
+        .btn-define { background-color: #9c27b0; } /* Purple for Dictionary */
         
         select { background-color: #565758; color: white; border: 0; padding: 8px 10px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.9rem; font-family: inherit; outline: none; }
         .toggle-label { display: flex; align-items: center; gap: 5px; cursor: pointer; }
@@ -239,6 +239,22 @@
         .correct { background-color: var(--correct); border-color: var(--correct); }
         .present { background-color: var(--present); border-color: var(--present); }
         .absent { background-color: var(--absent); border-color: var(--absent); }
+
+        /* --- PHANTOM TUTORIAL STYLES --- */
+        #tutorial-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: var(--bg); z-index: 99999; flex-direction: column;
+            align-items: center; justify-content: center; overflow: hidden;
+        }
+        .tut-hand {
+            position: absolute; font-size: 2.5rem; opacity: 0;
+            transition: top 0.4s cubic-bezier(0.25, 1, 0.5, 1), left 0.4s cubic-bezier(0.25, 1, 0.5, 1), transform 0.1s;
+            z-index: 100000; pointer-events: none; user-select: none;
+        }
+        .tut-text-box {
+            font-size: 1.2rem; font-weight: bold; color: #ffd700; text-align: center;
+            height: 60px; margin-bottom: 20px; padding: 0 20px;
+        }
     </style>
 </head>
 <body>
@@ -250,6 +266,8 @@
     </div>
 
     <div id="category-screen">
+        <button class="icon-btn" onclick="triggerFeedback('ui-click'); playTutorial()" style="position: absolute; top: 20px; right: 20px; width: 45px; height: 45px; z-index: 5001;">❓</button>
+
         <h2 class="cat-screen-title">Choose Your Subject</h2>
         <div class="cat-screen-sub">Select a category to start the game</div>
         
@@ -265,6 +283,40 @@
             <button class="cat-btn-large" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); startGame('Music')">🎵 Music Tech</button>
             <button class="cat-btn-large" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); startGame('Geopolitics')">🌐 Geopolitics</button>
         </div>
+    </div>
+
+    <div id="tutorial-overlay">
+        <button class="icon-btn" id="tutMuteBtn" onclick="toggleMute()" style="position: absolute; top: 20px; left: 20px; z-index: 100001;" title="Toggle Sound">🔊</button>
+        <button onclick="triggerFeedback('ui-click'); closeTutorial()" style="position: absolute; top: 20px; right: 20px; padding: 10px 15px; background: #3a3a3c; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight:bold; z-index: 100001;">Skip ⏭️</button>
+        
+        <div id="tut-text" class="tut-text-box">Let's learn how to play!</div>
+        
+        <div id="tut-scene-1" style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+            <div id="tut-cat-btn" class="cat-btn-large" style="width: 200px; text-align: center;">🌍 General</div>
+        </div>
+
+        <div id="tut-scene-2" style="display: none; flex-direction: column; align-items: center;">
+            <div class="row">
+                <div class="tile" id="tut-t-0-0"></div><div class="tile" id="tut-t-0-1"></div><div class="tile" id="tut-t-0-2"></div><div class="tile" id="tut-t-0-3"></div><div class="tile" id="tut-t-0-4"></div>
+            </div>
+            <div class="row">
+                <div class="tile" id="tut-t-1-0"></div><div class="tile" id="tut-t-1-1"></div><div class="tile" id="tut-t-1-2"></div><div class="tile" id="tut-t-1-3"></div><div class="tile" id="tut-t-1-4"></div>
+            </div>
+            
+            <div id="tut-keyboard" style="margin-top: 25px; pointer-events: none;">
+                <div class="tk-row">
+                    <div class="tk-key" id="tut-k-Q">Q</div><div class="tk-key" id="tut-k-W">W</div><div class="tk-key" id="tut-k-E">E</div><div class="tk-key" id="tut-k-R">R</div><div class="tk-key" id="tut-k-T">T</div><div class="tk-key" id="tut-k-Y">Y</div><div class="tk-key" id="tut-k-U">U</div><div class="tk-key" id="tut-k-I">I</div><div class="tk-key" id="tut-k-O">O</div><div class="tk-key" id="tut-k-P">P</div>
+                </div>
+                <div class="tk-row">
+                    <div class="tk-key" id="tut-k-A">A</div><div class="tk-key" id="tut-k-S">S</div><div class="tk-key" id="tut-k-D">D</div><div class="tk-key" id="tut-k-F">F</div><div class="tk-key" id="tut-k-G">G</div><div class="tk-key" id="tut-k-H">H</div><div class="tk-key" id="tut-k-J">J</div><div class="tk-key" id="tut-k-K">K</div><div class="tk-key" id="tut-k-L">L</div>
+                </div>
+                <div class="tk-row">
+                    <div class="tk-key" style="width: 55px; font-size: 0.8rem;" id="tut-k-ENTER">ENTER</div><div class="tk-key" id="tut-k-Z">Z</div><div class="tk-key" id="tut-k-X">X</div><div class="tk-key" id="tut-k-C">C</div><div class="tk-key" id="tut-k-V">V</div><div class="tk-key" id="tut-k-B">B</div><div class="tk-key" id="tut-k-N">N</div><div class="tk-key" id="tut-k-M">M</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tut-hand" class="tut-hand">👆</div>
     </div>
 
     <div class="header">
@@ -298,7 +350,9 @@
         <label class="toggle-label"><input type="checkbox" id="contrastToggle" onchange="toggleContrast(); triggerFeedback('ui-click');"> High Contrast</label>
 
         <button class="action-btn" onclick="triggerFeedback('ui-click'); getHint()">💡 Hint</button>
+        
         <button id="shareBtn" class="action-btn btn-share" style="display:none;" onclick="triggerFeedback('ui-click'); shareResults()">📤 Share</button>
+        <button id="defineBtn" class="action-btn btn-define" style="display:none;" onclick="triggerFeedback('ui-click'); openDictionary()">📖 Define</button>
         <button id="playAgainBtn" class="action-btn btn-restart" style="display:none;" onclick="triggerFeedback('ui-click'); returnToMenu()">🔄 Menu</button>
     </div>
 
@@ -314,18 +368,11 @@
 
     <div id="helpModal" class="modal" onclick="triggerFeedback('ui-click'); toggleModal('helpModal')">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <h3>How To Play</h3>
-            <p>Guess the word in exactly 6 tries. The category determines the theme!</p>
+            <h3>How To Play</h3><p>Guess the word in exactly 6 tries. The category determines the theme!</p>
             <hr style="border: 0.5px solid var(--border)">
-            <div class="example-row">
-                <div class="mini-tile correct">W</div> ORLD — <b>Correct:</b> Right letter, right spot.
-            </div>
-            <div class="example-row">
-                <div class="mini-tile present">L</div> IGHT — <b>Present:</b> Right letter, wrong spot.
-            </div>
-            <div class="example-row">
-                <div class="mini-tile absent">G</div> HOST — <b>Absent:</b> Not in the word.
-            </div>
+            <div class="example-row"><div class="mini-tile correct">W</div> ORLD — <b>Correct:</b> Right letter, right spot.</div>
+            <div class="example-row"><div class="mini-tile present">L</div> IGHT — <b>Present:</b> Right letter, wrong spot.</div>
+            <div class="example-row"><div class="mini-tile absent">G</div> HOST — <b>Absent:</b> Not in the word.</div>
             <button class="action-btn" onclick="triggerFeedback('ui-click'); toggleModal('helpModal')" style="margin-top:15px; width: 100%;">Close</button>
         </div>
     </div>
@@ -402,9 +449,15 @@
 
         function toggleMute() {
             isMuted = !isMuted;
-            const btn = document.getElementById('muteBtn');
-            btn.textContent = isMuted ? "🔇" : "🔊";
-            if (!isMuted) triggerFeedback('ui-click'); // Play sound to confirm it's on
+            
+            // Sync BOTH mute buttons (Main UI and Tutorial UI)
+            const mainBtn = document.getElementById('muteBtn');
+            const tutBtn = document.getElementById('tutMuteBtn');
+            
+            if (mainBtn) mainBtn.textContent = isMuted ? "🔇" : "🔊";
+            if (tutBtn) tutBtn.textContent = isMuted ? "🔇" : "🔊";
+            
+            if (!isMuted) triggerFeedback('ui-click'); 
         }
 
         function playSound(type) {
@@ -418,11 +471,9 @@
             gainNode.connect(audioCtx.destination);
             const now = audioCtx.currentTime;
             
-            // Fade in from 0 to prevent sharp "pops" in the speaker
             gainNode.gain.setValueAtTime(0, now);
             
             if (type === 'tap') {
-                // Soft keyboard tap (low frequency sine)
                 oscillator.type = 'sine';
                 oscillator.frequency.setValueAtTime(350, now);
                 oscillator.frequency.exponentialRampToValueAtTime(200, now + 0.1);
@@ -431,23 +482,22 @@
                 oscillator.start(now);
                 oscillator.stop(now + 0.1);
             } else if (type === 'hover') {
-                // Gentle bubble ping
                 oscillator.type = 'sine';
                 oscillator.frequency.setValueAtTime(700, now);
-                gainNode.gain.linearRampToValueAtTime(0.015, now + 0.01); // VERY quiet
+                gainNode.gain.linearRampToValueAtTime(0.015, now + 0.01); 
                 gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
                 oscillator.start(now);
                 oscillator.stop(now + 0.1);
             } else if (type === 'ui-click') {
-                // Smooth menu selection thud
                 oscillator.type = 'sine';
-                oscillator.frequency.setValueAtTime(500, now);
-                gainNode.gain.linearRampToValueAtTime(0.05, now + 0.01);
-                gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+                oscillator.frequency.setValueAtTime(400, now);
+                oscillator.frequency.exponentialRampToValueAtTime(100, now + 0.04);
+                gainNode.gain.setValueAtTime(0, now);
+                gainNode.gain.linearRampToValueAtTime(0.02, now + 0.005); 
+                gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
                 oscillator.start(now);
-                oscillator.stop(now + 0.1);
+                oscillator.stop(now + 0.04);
             } else if (type === 'error') {
-                // Soft low "dun" instead of harsh buzz
                 oscillator.type = 'sine';
                 oscillator.frequency.setValueAtTime(180, now);
                 oscillator.frequency.exponentialRampToValueAtTime(100, now + 0.2);
@@ -456,12 +506,11 @@
                 oscillator.start(now);
                 oscillator.stop(now + 0.2);
             } else if (type === 'win') {
-                // Soft, rounded victory chime
                 oscillator.type = 'sine';
-                oscillator.frequency.setValueAtTime(523.25, now);       // C5
-                oscillator.frequency.setValueAtTime(659.25, now + 0.1); // E5
-                oscillator.frequency.setValueAtTime(783.99, now + 0.2); // G5
-                oscillator.frequency.setValueAtTime(1046.50, now + 0.3); // C6
+                oscillator.frequency.setValueAtTime(523.25, now);       
+                oscillator.frequency.setValueAtTime(659.25, now + 0.1); 
+                oscillator.frequency.setValueAtTime(783.99, now + 0.2); 
+                oscillator.frequency.setValueAtTime(1046.50, now + 0.3); 
                 
                 gainNode.gain.linearRampToValueAtTime(0.1, now + 0.02);
                 gainNode.gain.linearRampToValueAtTime(0.0, now + 0.7);
@@ -478,6 +527,182 @@
             else if (type === 'win') navigator.vibrate([50, 100, 50, 100, 50]); 
         }
 
+        // --- PHANTOM TUTORIAL SYSTEM (Single Hand) ---
+        let tutActive = false;
+        const delay = ms => new Promise(res => setTimeout(res, ms));
+
+        async function typeTutorialKey(char) {
+            if(!tutActive) return;
+            const targetKey = document.getElementById(`tut-k-${char}`);
+            const rect = targetKey.getBoundingClientRect();
+            const hand = document.getElementById('tut-hand');
+            
+            // Move hand over key
+            hand.style.top = (rect.top + 5) + 'px';
+            hand.style.left = (rect.left + 5) + 'px';
+            hand.style.opacity = '1';
+            await delay(400);
+            
+            // Press Down
+            if(!tutActive) return;
+            triggerFeedback('tap');
+            hand.style.transform = 'scale(0.8)';
+            targetKey.style.backgroundColor = '#565758';
+            await delay(100);
+            
+            // Release
+            if(!tutActive) return;
+            hand.style.transform = 'scale(1)';
+            targetKey.style.backgroundColor = '#818384';
+        }
+
+        async function playTutorial() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            tutActive = true;
+            const overlay = document.getElementById('tutorial-overlay');
+            const text = document.getElementById('tut-text');
+            const scene1 = document.getElementById('tut-scene-1');
+            const scene2 = document.getElementById('tut-scene-2');
+            const fakeBtn = document.getElementById('tut-cat-btn');
+            const hand = document.getElementById('tut-hand');
+            
+            // Reset Overlay
+            overlay.style.display = 'flex';
+            scene1.style.display = 'flex';
+            scene2.style.display = 'none';
+            hand.style.opacity = '1';
+            hand.style.top = '100%'; hand.style.left = '50%';
+            text.innerHTML = "First, select a category...";
+
+            // Clear Fake Board
+            for(let i=0; i<2; i++) {
+                for(let j=0; j<5; j++) {
+                    const t = document.getElementById(`tut-t-${i}-${j}`);
+                    t.textContent = ""; t.className = "tile";
+                }
+            }
+
+            if(!tutActive) return; await delay(800);
+
+            // Hand clicks Category
+            if(!tutActive) return;
+            const btnRect = fakeBtn.getBoundingClientRect();
+            hand.style.top = (btnRect.top + 20) + 'px';
+            hand.style.left = (btnRect.left + 50) + 'px';
+            await delay(700);
+
+            // Click animation
+            if(!tutActive) return;
+            triggerFeedback('ui-click');
+            hand.style.transform = 'scale(0.8)';
+            fakeBtn.style.transform = 'scale(0.95)';
+            fakeBtn.style.borderColor = "var(--correct)";
+            await delay(200);
+            hand.style.transform = 'scale(1)';
+            fakeBtn.style.transform = 'scale(1)';
+            await delay(500);
+
+            // Transition to Scene 2 (The Board & Real Keyboard)
+            if(!tutActive) return;
+            scene1.style.display = 'none';
+            scene2.style.display = 'flex';
+            hand.style.top = '80%'; // Move hand down
+            text.innerHTML = "Guess the 5-letter word!<br>Let's guess 'WORDS'...";
+            await delay(1200);
+
+            // Type "WORDS" with hand
+            const word1 = "WORDS";
+            for(let i=0; i<5; i++) {
+                await typeTutorialKey(word1[i]);
+                if(!tutActive) return;
+                document.getElementById(`tut-t-0-${i}`).textContent = word1[i];
+            }
+
+            // Hit Enter
+            await typeTutorialKey('ENTER');
+            if(!tutActive) return;
+            
+            // Check Colors
+            const colors1 = ['correct', 'correct', 'correct', 'present', 'absent'];
+            for(let i=0; i<5; i++) {
+                if(!tutActive) return;
+                const t = document.getElementById(`tut-t-0-${i}`);
+                t.classList.add('flip');
+                triggerFeedback('tap');
+                t.classList.add(colors1[i]);
+                await delay(300);
+            }
+
+            if(!tutActive) return;
+            text.innerHTML = "<span style='color:var(--correct)'>Green = Perfect.</span> <span style='color:var(--present)'>Yellow = Wrong spot.</span><br>Let's try 'WORLD'...";
+            await delay(2500);
+
+            // Type "WORLD"
+            const word2 = "WORLD";
+            for(let i=0; i<5; i++) {
+                await typeTutorialKey(word2[i]);
+                if(!tutActive) return;
+                document.getElementById(`tut-t-1-${i}`).textContent = word2[i];
+            }
+
+            // Hit Enter
+            await typeTutorialKey('ENTER');
+            if(!tutActive) return;
+
+            for(let i=0; i<5; i++) {
+                if(!tutActive) return;
+                const t = document.getElementById(`tut-t-1-${i}`);
+                t.classList.add('flip');
+                triggerFeedback('tap');
+                t.classList.add('correct');
+                await delay(300);
+            }
+
+            if(!tutActive) return;
+            triggerFeedback('win');
+            fireConfetti();
+            text.innerHTML = "You Win! 🎉<br>Now it's your turn.";
+            hand.style.opacity = '0';
+            
+            await delay(3000);
+            closeTutorial();
+        }
+
+        function closeTutorial() {
+            tutActive = false; 
+            document.getElementById('tutorial-overlay').style.display = 'none';
+        }
+
+        // --- GAME LOGIC ---
+        
+        // --- GIANT DICTIONARY ARRAYS ---
+        const CATEGORIES = {
+            "General": ["REACT", "APPLE", "SMART", "WORLD", "GHOST", "CHESS", "BOARD", "HOUSE", "WATER", "MONEY", "PAPER", "CLOCK", "TRAIN", "GLASS", "CHAIR", "TABLE"],
+            "Science": ["ATOMS", "FORCE", "LASER", "FLUID", "SOLID", "PHASE", "LIGHT", "SOUND", "POWER", "PRISM", "OPTIC", "WAVES", "SCALE", "QUARK"],
+            "Chemistry": ["AMINE", "AMIDE", "ESTER", "ETHER", "BONDS", "MOLAR", "IONIC", "GASES", "OZONE", "RADON", "ACIDS", "BASES", "YIELD"],
+            "Biology": ["CELLS", "BLOOD", "BRAIN", "HEART", "VEINS", "SKULL", "PLANT", "VIRUS", "YEAST", "FUNGI", "SPORE", "GENES", "NERVES"],
+            "Zoology": ["TIGER", "EAGLE", "SNAKE", "SHARK", "WHALE", "BEARS", "LIONS", "FROGS", "BIRDS", "HORSE", "RHINO", "HIPPO", "MOOSE", "ZEBRA"],
+            "Astronomy": ["VENUS", "MARS", "STARS", "MOONS", "SOLAR", "LUNAR", "SPACE", "ORBIT", "COMET", "ALIEN", "ASTRO"],
+            "History": ["INDUS", "CIVIL", "RUINS", "TOMBS", "KINGS", "MYTHS", "ROMAN", "GREEK", "STONE", "TRIBE", "CRAFT", "TOOLS"],
+            "Music": ["AUDIO", "TRACK", "BEATS", "MIXER", "TEMPO", "CHORD", "VOCAL", "SYNTH", "SOUND", "VINYL", "TUNES"],
+            "Maths": ["GRAPH", "CURVE", "SLOPE", "RATIO", "AXIOM", "PROVE", "EQUAL", "LIMIT", "ANGLE", "DIGIT", "PRIME"],
+            "Geopolitics": ["TRADE", "POWER", "TREAT", "ALLYS", "ASIAN", "STATE", "WORLD", "NAVAL", "PEACE", "CLASH", "SPIES"]
+        };
+
+        const COMMON_WORDS_STRING = "ABOUT,ABOVE,ABUSE,ACTOR,ACUTE,ADAPT,ADMIT,ADOPT,ADULT,AFTER,AGAIN,AGENT,AGREE,AHEAD,ALARM,ALBUM,ALERT,ALIEN,ALIGN,ALIKE,ALIVE,ALLOW,ALONE,ALONG,ALTER,AMONG,ANGER,ANGLE,ANGRY,APPLE,APPLY,ARENA,ARGUE,ARISE,ARRAY,ARROW,ASIAN,ASIDE,ASSET,AUDIO,AUDIT,AVOID,AWAKE,AWARD,AWARE,AWFUL,BACON,BAKER,BASIC,BASIN,BASIS,BATCH,BEACH,BEARD,BEAST,BEGIN,BEING,BELOW,BENCH,BILLY,BIRTH,BLACK,BLADE,BLAME,BLANK,BLIND,BLOCK,BLOOD,BOARD,BOAST,BONUS,BOOST,BOOTH,BOUND,BRAIN,BRAKE,BRAND,BREAD,BREAK,BREED,BRICK,BRIDE,BRIEF,BRING,BROAD,BROKE,BROWN,BRUSH,BUILD,BUILT,BUYER,CABIN,CABLE,CATCH,CAUSE,CHAIN,CHAIR,CHART,CHASE,CHEAP,CHECK,CHEEK,CHEER,CHESS,CHEST,CHIEF,CHILD,CHINA,CHOIR,CHOSE,CIVIC,CIVIL,CLAIM,CLASS,CLEAN,CLEAR,CLERK,CLICK,CLOCK,CLOSE,COACH,COAST,COLON,COLOR,COMIC,CORAL,COTTON,COUCH,COULD,COUNT,COURT,COVER,CRACK,CRAFT,CRASH,CRAZY,CREAM,CRIME,CROSS,CROWD,CROWN,CRUEL,CURVE,CYCLE,DAILY,DANCE,DATED,DEALT,DEATH,DEBUT,DELAY,DEPTH,DEVIL,DIARY,DIGIT,DIRTY,DISCO,DITCH,DONOR,DOUBT,DRAFT,DRAMA,DRAWN,DREAM,DRESS,DRILL,DRINK,DRIVE,DRUNK,EAGER,EAGLE,EARLY,EARTH,EIGHT,ELITE,EMPTY,ENEMY,ENJOY,ENTER,ENTRY,EQUAL,ERROR,ESSAY,EVENT,EVERY,EXACT,EXIST,EXTRA,FAITH,FALSE,FAULT,FIBER,FIELD,FIFTH,FIFTY,FIGHT,FINAL,FIRST,FIXED,FLASH,FLEET,FLESH,FLIGHT,FLOOR,FLOUR,FLUID,FOCUS,FORCE,FORTH,FORTY,FORUM,FOUND,FRAME,FRAUD,FRESH,FRONT,FRUIT,FULLY,FUNNY,GIANT,GIVEN,GLASS,GLOBE,GLORY,GOING,GRACE,GRADE,GRAND,GRANT,GRASS,GREAT,GREEN,GROSS,GROUP,GROWN,GUARD,GUESS,GUEST,GUIDE,HABIT,HAPPY,HARSH,HEART,HEAVY,HELLO,HENCE,HORSE,HOTEL,HOUSE,HUMAN,IDEAL,IMAGE,INDEX,INNER,INPUT,ISSUE,JOINT,JUDGE,JUICE,KNOWN,LABEL,LABOR,LARGE,LATER,LAUGH,LAYER,LEARN,LEASE,LEAST,LEAVE,LEGAL,LEMON,LEVEL,LIGHT,LIMIT,LINEN,LOCAL,LOGIC,LOOSE,LOWER,LUCKY,LUNCH,MAGIC,MAJOR,MAKER,MARCH,MARRY,MATCH,MAYBE,MAYOR,MEANT,MEDIA,MERIT,METAL,METER,MIGHT,MINOR,MINUS,MIXED,MODEL,MONEY,MONTH,MORAL,MOTOR,MOUNT,MOUSE,MOUTH,MOVIE,MUSIC,NEEDS,NEVER,NEWLY,NIGHT,NOISE,NORTH,NOVEL,NURSE,OCCUR,OCEAN,OFFER,OFTEN,ONION,ORDER,ORGAN,OTHER,OUGHT,OUNCE,OUTER,OWNER,PANEL,PAPER,PARTY,PATCH,PEACE,PHASE,PHONE,PHOTO,PIANO,PIECE,PILOT,PITCH,PLACE,PLAIN,PLANE,PLANT,PLATE,POINT,POUND,POWER,PRESS,PRICE,PRIDE,PRIME,PRINT,PRIOR,PRIZE,PROOF,PROUD,PROVE,QUEEN,QUICK,QUIET,QUITE,RADIO,RAISE,RANGE,RAPID,RATIO,REACH,REACT,READY,REALM,REBEL,REFER,RELAX,RELAY,REPLY,RIGHT,RIVER,ROMAN,ROUGH,ROUND,ROUTE,ROYAL,RURAL,SCALE,SCENE,SCOPE,SCORE,SENSE,SERVE,SETUP,SEVEN,SHALL,SHAPE,SHARE,SHARP,SHEET,SHELF,SHELL,SHIFT,SHIRT,SHOCK,SHOOT,SHORT,SHOWN,SIGHT,SINCE,SIXTH,SIXTY,SKILL,SLEEP,SLIDE,SMALL,SMART,SMILE,SMITH,SMOKE,SOLID,SOLVE,SORRY,SOUND,SOUTH,SPACE,SPARE,SPEAK,SPEED,SPELL,SPEND,SPENT,SPLIT,SPOKE,SPORT,STAFF,STAGE,STAND,START,STATE,STEAM,STEEL,STICK,STILL,STOCK,STONE,STOOD,STORE,STORM,STORY,STRIP,STUCK,STUDY,STUFF,STYLE,SUGAR,SUPER,SWEET,TABLE,TAKEN,TASTE,TAXES,TEACH,TEETH,TENTH,TEXAS,THANK,THEFT,THEIR,THEME,THERE,THESE,THICK,THIEF,THING,THINK,THIRD,THOSE,THREE,THREW,THROW,TIGER,TIGHT,TIMES,TITLE,TODAY,TOPIC,TOTAL,TOUCH,TOUGH,TOWER,TRACK,TRADE,TRAIN,TREAT,TREND,TRIAL,TRIBE,TRICK,TRUCK,TRULY,TRUST,TRUTH,TWICE,UNDER,UNION,UNITY,UNTIL,UPPER,UPSET,URBAN,USAGE,USUAL,VALID,VALUE,VIDEO,VIRUS,VISIT,VITAL,VOICE,VOTER,WAGON,WASTE,WATCH,WATER,WHEEL,WHERE,WHICH,WHILE,WHITE,WHOLE,WHOSE,WOMAN,WOMEN,WORDS,WORLD,WORRY,WORSE,WORST,WORTH,WOULD,WOUND,WRITE,WRONG,YIELD,YOUNG,YOUTH";
+        
+        const VALID_GUESSES = [...new Set([...Object.values(CATEGORIES).flat(), ...COMMON_WORDS_STRING.split(",")])];
+
+        let currentCategory = "General";
+        let targetWord = "";
+        let currentRow = 0, currentCol = 0, gameOver = false, startTime, timerInt;
+        let guesses = Array(6).fill("");
+        let boardEmoji = [];
+        let letterStates = {}; 
+        let timeHintOffered = false;
+        
+        let stats = JSON.parse(localStorage.getItem('syllabix-stats-v2')) || { played: 0, won: 0, currentStreak: 0, maxStreak: 0, guesses: {1:0, 2:0, 3:0, 4:0, 5:0, 6:0} };
+
         window.addEventListener('load', () => {
             initBoardAndKeyboard(); 
             const splash = document.getElementById('splash-screen');
@@ -493,35 +718,8 @@
             }
         });
 
-        const CATEGORIES = {
-            "General": ["REACT", "APPLE", "SMART", "WORLD", "GHOST", "CHESS", "BOARD", "HOUSE", "WATER", "MONEY", "PAPER", "CLOCK", "TRAIN", "GLASS", "CHAIR", "TABLE"],
-            "Science": ["ATOMS", "FORCE", "LASER", "FLUID", "SOLID", "PHASE", "LIGHT", "SOUND", "POWER", "PRISM", "OPTIC", "WAVES", "SCALE", "QUARK"],
-            "Chemistry": ["AMINE", "AMIDE", "ESTER", "ETHER", "BONDS", "MOLAR", "IONIC", "GASES", "OZONE", "RADON", "ACIDS", "BASES", "YIELD"],
-            "Biology": ["CELLS", "BLOOD", "BRAIN", "HEART", "VEINS", "SKULL", "PLANT", "VIRUS", "YEAST", "FUNGI", "SPORE", "GENES", "NERVES"],
-            "Zoology": ["TIGER", "EAGLE", "SNAKE", "SHARK", "WHALE", "BEARS", "LIONS", "FROGS", "BIRDS", "HORSE", "RHINO", "HIPPO", "MOOSE", "ZEBRA"],
-            "Astronomy": ["VENUS", "MARS", "STARS", "MOONS", "SOLAR", "LUNAR", "SPACE", "ORBIT", "COMET", "ALIEN", "ASTRO"],
-            "History": ["INDUS", "CIVIL", "RUINS", "TOMBS", "KINGS", "MYTHS", "ROMAN", "GREEK", "STONE", "TRIBE", "CRAFT", "TOOLS"],
-            "Music": ["AUDIO", "TRACK", "BEATS", "MIXER", "TEMPO", "CHORD", "VOCAL", "SYNTH", "SOUND", "VINYL", "TUNES"],
-            "Maths": ["GRAPH", "CURVE", "SLOPE", "RATIO", "AXIOM", "PROVE", "EQUAL", "LIMIT", "ANGLE", "DIGIT", "PRIME"],
-            "Geopolitics": ["TRADE", "POWER", "TREAT", "ALLYS", "ASIAN", "STATE", "WORLD", "NAVAL", "PEACE", "CLASH", "SPIES"]
-        };
-
-        const COMMON_WORDS_STRING = "ABOUT,ABOVE,ABUSE,ACTOR,ACUTE,ADAPT,ADMIT,ADOPT,ADULT,AFTER,AGAIN,AGENT,AGREE,AHEAD,ALARM,ALBUM,ALERT,ALIEN,ALIGN,ALIKE,ALIVE,ALLOW,ALONE,ALONG,ALTER,AMONG,ANGER,ANGLE,ANGRY,APPLE,APPLY,ARENA,ARGUE,ARISE,ARRAY,ARROW,ASIAN,ASIDE,ASSET,AUDIO,AUDIT,AVOID,AWAKE,AWARD,AWARE,AWFUL,BACON,BAKER,BASIC,BASIN,BASIS,BATCH,BEACH,BEARD,BEAST,BEGIN,BEING,BELOW,BENCH,BILLY,BIRTH,BLACK,BLADE,BLAME,BLANK,BLIND,BLOCK,BLOOD,BOARD,BOAST,BONUS,BOOST,BOOTH,BOUND,BRAIN,BRAKE,BRAND,BREAD,BREAK,BREED,BRICK,BRIDE,BRIEF,BRING,BROAD,BROKE,BROWN,BRUSH,BUILD,BUILT,BUYER,CABIN,CABLE,CATCH,CAUSE,CHAIN,CHAIR,CHART,CHASE,CHEAP,CHECK,CHEEK,CHEER,CHESS,CHEST,CHIEF,CHILD,CHINA,CHOIR,CHOSE,CIVIC,CIVIL,CLAIM,CLASS,CLEAN,CLEAR,CLERK,CLICK,CLOCK,CLOSE,COACH,COAST,COLON,COLOR,COMIC,CORAL,COTTON,COUCH,COULD,COUNT,COURT,COVER,CRACK,CRAFT,CRASH,CRAZY,CREAM,CRIME,CROSS,CROWD,CROWN,CRUEL,CURVE,CYCLE,DAILY,DANCE,DATED,DEALT,DEATH,DEBUT,DELAY,DEPTH,DEVIL,DIARY,DIGIT,DIRTY,DISCO,DITCH,DONOR,DOUBT,DRAFT,DRAMA,DRAWN,DREAM,DRESS,DRILL,DRINK,DRIVE,DRUNK,EAGER,EAGLE,EARLY,EARTH,EIGHT,ELITE,EMPTY,ENEMY,ENJOY,ENTER,ENTRY,EQUAL,ERROR,ESSAY,EVENT,EVERY,EXACT,EXIST,EXTRA,FAITH,FALSE,FAULT,FIBER,FIELD,FIFTH,FIFTY,FIGHT,FINAL,FIRST,FIXED,FLASH,FLEET,FLESH,FLIGHT,FLOOR,FLOUR,FLUID,FOCUS,FORCE,FORTH,FORTY,FORUM,FOUND,FRAME,FRAUD,FRESH,FRONT,FRUIT,FULLY,FUNNY,GIANT,GIVEN,GLASS,GLOBE,GLORY,GOING,GRACE,GRADE,GRAND,GRANT,GRASS,GREAT,GREEN,GROSS,GROUP,GROWN,GUARD,GUESS,GUEST,GUIDE,HABIT,HAPPY,HARSH,HEART,HEAVY,HELLO,HENCE,HORSE,HOTEL,HOUSE,HUMAN,IDEAL,IMAGE,INDEX,INNER,INPUT,ISSUE,JOINT,JUDGE,JUICE,KNOWN,LABEL,LABOR,LARGE,LATER,LAUGH,LAYER,LEARN,LEASE,LEAST,LEAVE,LEGAL,LEMON,LEVEL,LIGHT,LIMIT,LINEN,LOCAL,LOGIC,LOOSE,LOWER,LUCKY,LUNCH,MAGIC,MAJOR,MAKER,MARCH,MARRY,MATCH,MAYBE,MAYOR,MEANT,MEDIA,MERIT,METAL,METER,MIGHT,MINOR,MINUS,MIXED,MODEL,MONEY,MONTH,MORAL,MOTOR,MOUNT,MOUSE,MOUTH,MOVIE,MUSIC,NEEDS,NEVER,NEWLY,NIGHT,NOISE,NORTH,NOVEL,NURSE,OCCUR,OCEAN,OFFER,OFTEN,ONION,ORDER,ORGAN,OTHER,OUGHT,OUNCE,OUTER,OWNER,PANEL,PAPER,PARTY,PATCH,PEACE,PHASE,PHONE,PHOTO,PIANO,PIECE,PILOT,PITCH,PLACE,PLAIN,PLANE,PLANT,PLATE,POINT,POUND,POWER,PRESS,PRICE,PRIDE,PRIME,PRINT,PRIOR,PRIZE,PROOF,PROUD,PROVE,QUEEN,QUICK,QUIET,QUITE,RADIO,RAISE,RANGE,RAPID,RATIO,REACH,REACT,READY,REALM,REBEL,REFER,RELAX,RELAY,REPLY,RIGHT,RIVER,ROMAN,ROUGH,ROUND,ROUTE,ROYAL,RURAL,SCALE,SCENE,SCOPE,SCORE,SENSE,SERVE,SETUP,SEVEN,SHALL,SHAPE,SHARE,SHARP,SHEET,SHELF,SHELL,SHIFT,SHIRT,SHOCK,SHOOT,SHORT,SHOWN,SIGHT,SINCE,SIXTH,SIXTY,SKILL,SLEEP,SLIDE,SMALL,SMART,SMILE,SMITH,SMOKE,SOLID,SOLVE,SORRY,SOUND,SOUTH,SPACE,SPARE,SPEAK,SPEED,SPELL,SPEND,SPENT,SPLIT,SPOKE,SPORT,STAFF,STAGE,STAND,START,STATE,STEAM,STEEL,STICK,STILL,STOCK,STONE,STOOD,STORE,STORM,STORY,STRIP,STUCK,STUDY,STUFF,STYLE,SUGAR,SUPER,SWEET,TABLE,TAKEN,TASTE,TAXES,TEACH,TEETH,TENTH,TEXAS,THANK,THEFT,THEIR,THEME,THERE,THESE,THICK,THIEF,THING,THINK,THIRD,THOSE,THREE,THREW,THROW,TIGER,TIGHT,TIMES,TITLE,TODAY,TOPIC,TOTAL,TOUCH,TOUGH,TOWER,TRACK,TRADE,TRAIN,TREAT,TREND,TRIAL,TRIBE,TRICK,TRUCK,TRULY,TRUST,TRUTH,TWICE,UNDER,UNION,UNITY,UNTIL,UPPER,UPSET,URBAN,USAGE,USUAL,VALID,VALUE,VIDEO,VIRUS,VISIT,VITAL,VOICE,VOTER,WAGON,WASTE,WATCH,WATER,WHEEL,WHERE,WHICH,WHILE,WHITE,WHOLE,WHOSE,WOMAN,WOMEN,WORDS,WORLD,WORRY,WORSE,WORST,WORTH,WOULD,WOUND,WRITE,WRONG,YIELD,YOUNG,YOUTH";
-        const VALID_GUESSES = [...new Set([...Object.values(CATEGORIES).flat(), ...COMMON_WORDS_STRING.split(",")])];
-
-        let currentCategory = "General";
-        let targetWord = "";
-        let currentRow = 0, currentCol = 0, gameOver = false, startTime, timerInt;
-        let guesses = Array(6).fill("");
-        let boardEmoji = [];
-        let letterStates = {}; 
-        let timeHintOffered = false;
-        
-        let stats = JSON.parse(localStorage.getItem('syllabix-stats-v2')) || { played: 0, won: 0, currentStreak: 0, maxStreak: 0, guesses: {1:0, 2:0, 3:0, 4:0, 5:0, 6:0} };
-
         function startGame(category) {
             if (audioCtx.state === 'suspended') audioCtx.resume();
-            
             currentCategory = category;
             document.getElementById('categorySelect').value = category; 
             const catScreen = document.getElementById('category-screen');
@@ -612,6 +810,7 @@
             document.querySelectorAll('.tk-key').forEach(k => k.className = 'tk-key');
             document.getElementById('timer').textContent = "00:00";
             document.getElementById('shareBtn').style.display = "none";
+            document.getElementById('defineBtn').style.display = "none";
             document.getElementById('playAgainBtn').style.display = "none";
             showMsg(""); startTimer(); 
         }
@@ -784,7 +983,12 @@
 
         function showEndgameButtons() {
             document.getElementById('shareBtn').style.display = "inline-block";
+            document.getElementById('defineBtn').style.display = "inline-block";
             document.getElementById('playAgainBtn').style.display = "inline-block";
+        }
+
+        function openDictionary() {
+            window.open(`https://www.merriam-webster.com/dictionary/${targetWord.toLowerCase()}`, '_blank');
         }
 
         function toggleModal(id) {
