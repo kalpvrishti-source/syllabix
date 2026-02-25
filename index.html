@@ -118,7 +118,7 @@
         .header h1 { margin: 0; font-size: 2.2rem; letter-spacing: 2px; text-align: center; text-transform: uppercase; }
         .header-left { display: flex; gap: 8px; justify-content: flex-start; flex-wrap: wrap; }
         .header-right { display: flex; flex-direction: row; align-items: center; justify-content: flex-end; gap: 10px; font-size: 0.85rem; }
-        #timer { font-family: monospace; font-size: 1.1rem; color: var(--text); opacity: 0.7; }
+        #timer { font-family: monospace; font-size: 1.1rem; color: var(--text); opacity: 0.7; transition: color 0.3s, opacity 0.3s;}
         
         .icon-btn { 
             background: none; border: 2px solid var(--border); color: var(--text); 
@@ -161,7 +161,7 @@
         .active-flash { transform: scale(0.85); filter: brightness(1.5); }
         .tk-key:active { transform: scale(0.9); } 
 
-        .tk-action { display: none; } 
+        .tk-action { display: none; } /* Hides Enter/Backspace on PC */
         
         .tk-correct { background-color: var(--correct) !important; color: #fff !important; border-color: var(--correct) !important; }
         .tk-present { background-color: var(--present) !important; color: #fff !important; border-color: var(--present) !important; }
@@ -409,6 +409,11 @@
                     <option value="Maths">Maths / JEE</option>
                     <option value="Geopolitics">Geopolitics</option>
                 </select>
+            </div>
+
+            <div class="settings-row">
+                <span class="settings-label">5-Min Countdown</span>
+                <label class="toggle-label"><input type="checkbox" id="countdownToggle" onchange="toggleCountdown(); triggerFeedback('ui-click');"> Enable</label>
             </div>
             
             <div class="settings-row">
@@ -762,6 +767,7 @@
         const VALID_GUESSES = [...new Set([...Object.values(CATEGORIES).flat(), ...COMMON_WORDS_STRING.split(",")])];
 
         let currentCategory = "General";
+        let isCountdown = false; 
         let targetWord = "";
         let currentRow = 0, currentCol = 0, gameOver = false, startTime, timerInt;
         let guesses = Array(6).fill("");
@@ -770,8 +776,8 @@
         let timeHintOffered = false;
         let isPaused = false;
         let pauseStartTime = 0;
+        let finalTimeStr = "00:00";
         
-        // --- NEW: INITIALIZE STATS WITH DAILY TRACKER ---
         let stats = JSON.parse(localStorage.getItem('syllabix-stats-v2')) || { played: 0, won: 0, currentStreak: 0, maxStreak: 0, guesses: {1:0, 2:0, 3:0, 4:0, 5:0, 6:0} };
         if (!stats.daily) stats.daily = { date: "", status: "", attempts: 0, word: "" };
 
@@ -790,7 +796,6 @@
             }
         });
 
-        // --- NEW: DAILY CHALLENGE LOCK LOGIC ---
         function checkDailyLock() {
             const today = new Date().toLocaleDateString();
             return (stats.daily && stats.daily.date === today && stats.daily.status !== "");
@@ -803,6 +808,8 @@
                 msgEl.innerHTML = `You solved today's word in <b style="color:var(--correct)">${stats.daily.attempts}</b> attempts!<br>Come back tomorrow.`;
             } else if (stats.daily.status === 'gave_up') {
                 msgEl.innerHTML = `You gave up today.<br>The word was <b style="color:var(--present)">${stats.daily.word}</b>.<br>Come back tomorrow.`;
+            } else if (stats.daily.status === 'time_up') {
+                msgEl.innerHTML = `You ran out of time today.<br>The word was <b style="color:var(--present)">${stats.daily.word}</b>.<br>Come back tomorrow.`;
             } else {
                 msgEl.innerHTML = `You ran out of attempts.<br>The word was <b style="color:var(--present)">${stats.daily.word}</b>.<br>Come back tomorrow.`;
             }
@@ -816,7 +823,7 @@
             const updateTimer = () => {
                 const now = new Date();
                 const midnight = new Date(now);
-                midnight.setHours(24, 0, 0, 0); // Next midnight
+                midnight.setHours(24, 0, 0, 0); 
                 const diff = midnight - now;
 
                 const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)).toString().padStart(2, '0');
@@ -832,7 +839,6 @@
         function closeDailyLock() {
             if (dailyCountdownInt) clearInterval(dailyCountdownInt);
             document.getElementById('dailyLockModal').style.display = 'none';
-            // Revert Dropdown visually if they tried to bypass it
             if (document.getElementById('categorySelect').value === 'Daily') {
                 document.getElementById('categorySelect').value = currentCategory === 'Daily' ? 'General' : currentCategory;
             }
@@ -882,11 +888,26 @@
                 showDailyLock();
                 return; 
             }
-            
             currentCategory = newCat;
             resetGame(); 
             showMsg(`Subject changed to: ${currentCategory}`);
             setTimeout(() => { if(document.getElementById('message').textContent.includes('Subject')) showMsg(""); }, 2000);
+        }
+
+        // --- NEW: CLEAN TOGGLE TIMER ---
+        function toggleCountdown() {
+            const willBeCountdown = document.getElementById('countdownToggle').checked;
+            
+            if (currentCategory === 'Daily' && (currentRow > 0 || currentCol > 0) && !gameOver) {
+                showMsg("Can't change timer mid-game!");
+                document.getElementById('countdownToggle').checked = isCountdown;
+                return;
+            }
+            
+            isCountdown = willBeCountdown;
+            resetGame();
+            showMsg(isCountdown ? `Timer set to: 5 Min Countdown` : `Timer set to: Count Up`);
+            setTimeout(() => { if(document.getElementById('message').textContent.includes('Timer')) showMsg(""); }, 2000);
         }
 
         function returnToMenu() {
@@ -941,20 +962,81 @@
             });
         }
 
+        // --- NEW: DUAL TIMER LOGIC ---
         function startTimer() {
             if(timerInt) clearInterval(timerInt); 
             startTime = Date.now();
+            
+            document.getElementById('timer').style.color = '';
+            
+            if (isCountdown) {
+                document.getElementById('timer').textContent = "05:00";
+            } else {
+                document.getElementById('timer').textContent = "00:00";
+            }
+            
             timerInt = setInterval(() => {
                 if (gameOver || isPaused) return; 
-                const diff = Math.floor((Date.now() - startTime) / 1000);
-                const m = Math.floor(diff / 60).toString().padStart(2, '0');
-                const s = (diff % 60).toString().padStart(2, '0');
-                document.getElementById('timer').textContent = `${m}:${s}`;
-                if (diff >= 300 && !timeHintOffered && !gameOver) {
-                    timeHintOffered = true;
-                    toggleModal('timeHintModal');
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                
+                if (!isCountdown) {
+                    // Stopwatch Mode (Count Up)
+                    const m = Math.floor(elapsed / 60).toString().padStart(2, '0');
+                    const s = (elapsed % 60).toString().padStart(2, '0');
+                    document.getElementById('timer').textContent = `${m}:${s}`;
+                    
+                    if (elapsed >= 300 && !timeHintOffered && !gameOver) {
+                        timeHintOffered = true;
+                        toggleModal('timeHintModal');
+                    }
+                } else {
+                    // Countdown Mode (5 Minutes)
+                    const remaining = 300 - elapsed;
+                    
+                    if (remaining <= 0) {
+                        document.getElementById('timer').textContent = "00:00";
+                        timeUp();
+                        return;
+                    }
+                    
+                    if (remaining <= 60) document.getElementById('timer').style.color = '#ff5252';
+                    
+                    const m = Math.floor(remaining / 60).toString().padStart(2, '0');
+                    const s = (remaining % 60).toString().padStart(2, '0');
+                    document.getElementById('timer').textContent = `${m}:${s}`;
+                    
+                    if (elapsed >= 150 && !timeHintOffered && !gameOver) {
+                        timeHintOffered = true;
+                        toggleModal('timeHintModal');
+                    }
                 }
             }, 1000);
+        }
+        
+        function freezeTime() {
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            if (!isCountdown) {
+                const m = Math.floor(elapsed / 60).toString().padStart(2, '0');
+                const s = (elapsed % 60).toString().padStart(2, '0');
+                finalTimeStr = `${m}:${s}`;
+            } else {
+                const remaining = Math.max(0, 300 - elapsed);
+                const m = Math.floor(remaining / 60).toString().padStart(2, '0');
+                const s = (remaining % 60).toString().padStart(2, '0');
+                finalTimeStr = `${m}:${s} left`;
+            }
+        }
+
+        function timeUp() {
+            if(gameOver) return;
+            gameOver = true;
+            freezeTime();
+            clearInterval(timerInt);
+            triggerFeedback('error');
+            showMsg(`Time's Up! Word: ${targetWord}`, true);
+            if (currentCategory === "Daily") stats.daily = { date: new Date().toLocaleDateString(), status: "time_up", attempts: currentRow, word: targetWord };
+            saveStats(false);
+            showEndgameButtons();
         }
 
         function resetGame() {
@@ -979,7 +1061,6 @@
                 k.className = 'tk-key';
                 if(k.id === 'tk-ENTER' || k.id === 'tk-⌫') k.classList.add('tk-action');
             });
-            document.getElementById('timer').textContent = "00:00";
             
             document.getElementById('giveUpBtn').style.display = "inline-flex";
             document.getElementById('shareBtn').style.display = "none";
@@ -1066,19 +1147,19 @@
             boardEmoji.push(rowEmoji);
 
             if(guess === targetWord) {
+                freezeTime();
                 clearInterval(timerInt);
                 triggerFeedback('win');
                 showMsg("Impressive! 🎉");
                 fireConfetti();
-                // SAVE DAILY LOCK
                 if (currentCategory === "Daily") stats.daily = { date: new Date().toLocaleDateString(), status: "won", attempts: currentRow + 1, word: targetWord };
                 saveStats(true);
                 showEndgameButtons();
             } else if(currentRow === 5) {
+                freezeTime();
                 clearInterval(timerInt);
                 triggerFeedback('error');
                 showMsg(`You used all attempts! Word: ${targetWord}`, true);
-                // SAVE DAILY LOCK
                 if (currentCategory === "Daily") stats.daily = { date: new Date().toLocaleDateString(), status: "lost", attempts: 6, word: targetWord };
                 saveStats(false);
                 showEndgameButtons();
@@ -1090,10 +1171,10 @@
         function giveUpWord() {
             if(gameOver) return;
             gameOver = true;
+            freezeTime();
             clearInterval(timerInt);
             triggerFeedback('error');
             showMsg(`You gave up! Word: ${targetWord}`, true);
-            // SAVE DAILY LOCK
             if (currentCategory === "Daily") stats.daily = { date: new Date().toLocaleDateString(), status: "gave_up", attempts: currentRow, word: targetWord };
             saveStats(false);
             showEndgameButtons();
@@ -1195,7 +1276,10 @@
         }
 
         function shareResults() {
-            const text = `Syllabix [${currentCategory}] ${currentRow === 6 && guesses[5] !== targetWord ? 'X' : currentRow + 1}/6 (${document.getElementById('timer').textContent})\n🔥 Streak: ${stats.currentStreak}\n\n${boardEmoji.join('\n')}`;
+            let timeLabel = finalTimeStr;
+            if (isCountdown) timeLabel += " (Timed)";
+            
+            const text = `Syllabix [${currentCategory}] ${currentRow === 6 && guesses[5] !== targetWord ? 'X' : currentRow + 1}/6 ⏱️ ${timeLabel}\n🔥 Streak: ${stats.currentStreak}\n\n${boardEmoji.join('\n')}`;
             navigator.clipboard.writeText(text);
             showMsg("Results copied to clipboard!");
             setTimeout(() => { if(document.getElementById('message').textContent === "Results copied to clipboard!") showMsg(""); }, 2000);
