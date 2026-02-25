@@ -87,14 +87,20 @@
         /* --- CATEGORY SELECTION SCREEN --- */
         #category-screen {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: var(--bg);
-            z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 5000; overflow-y: auto; /* Fixes scrolling issue */
             transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out, background-color 0.4s;
         }
         
-        .cat-screen-title { font-size: 2rem; margin-bottom: 5px; letter-spacing: 2px; text-align: center; }
+        /* New Inner Wrapper to handle centering and scrolling perfectly */
+        .cat-screen-inner {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            min-height: 100%; padding: 80px 20px 50px 20px; /* 80px top padding ensures no overlap with ? button */
+        }
+        
+        .cat-screen-title { font-size: 2rem; margin-bottom: 5px; letter-spacing: 2px; text-align: center; margin-top: 0;}
         .cat-screen-sub { color: var(--text); opacity: 0.7; margin-bottom: 30px; font-size: 0.9rem; text-align: center; }
 
-        .cat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; width: 90%; max-width: 500px; }
+        .cat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; width: 100%; max-width: 500px; }
 
         .cat-btn-large {
             background-color: transparent; color: var(--text); border: 2px solid var(--border);
@@ -275,6 +281,8 @@
             #playAgainBtn { grid-column: 1 / -1; }
 
             .tile { width: 50px; height: 50px; font-size: 1.8rem; }
+            
+            /* Fixes the category screen grid on Mobile */
             .cat-grid { grid-template-columns: 1fr; }
             .tk-row { gap: 4px; margin-bottom: 6px; width: 100%; }
             .tk-key { height: 45px; font-size: 0.9rem; border-radius: 4px; min-width: 0; padding: 0;}
@@ -290,23 +298,25 @@
     </div>
 
     <div id="category-screen">
-        <button class="icon-btn" onclick="triggerFeedback('ui-click'); playTutorial()" style="position: absolute; top: 20px; right: 20px; width: 45px; height: 45px; z-index: 5001;">❓</button>
+        <button class="icon-btn" onclick="triggerFeedback('ui-click'); playTutorial()" style="position: fixed; top: 20px; right: 20px; width: 45px; height: 45px; z-index: 5001;">❓</button>
 
-        <h2 class="cat-screen-title">Choose Your Subject</h2>
-        <div class="cat-screen-sub">Select a category to start the game</div>
-        
-        <div class="cat-grid">
-            <button class="cat-btn-large" style="grid-column: 1 / -1; border-color: var(--present); color: var(--present);" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); startGame('Daily')">⭐ PLAY DAILY CHALLENGE ⭐</button>
-            <button class="cat-btn-large" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); startGame('General')">🌍 General</button>
-            <button class="cat-btn-large" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); startGame('Science')">🔭 Science</button>
-            <button class="cat-btn-large" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); startGame('Chemistry')">🧪 Chemistry</button>
-            <button class="cat-btn-large" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); startGame('Biology')">🧬 Biology</button>
-            <button class="cat-btn-large" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); startGame('Zoology')">🦁 Zoology</button>
-            <button class="cat-btn-large" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); startGame('Astronomy')">🪐 Astronomy</button>
-            <button class="cat-btn-large" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); startGame('History')">🏛️ History</button>
-            <button class="cat-btn-large" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); startGame('Maths')">➗ Maths / JEE</button>
-            <button class="cat-btn-large" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); startGame('Music')">🎵 Music Tech</button>
-            <button class="cat-btn-large" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); startGame('Geopolitics')">🌐 Geopolitics</button>
+        <div class="cat-screen-inner">
+            <h2 class="cat-screen-title">Choose Your Subject</h2>
+            <div class="cat-screen-sub">Select a category to start the game</div>
+            
+            <div class="cat-grid">
+                <button class="cat-btn-large" style="grid-column: 1 / -1; border-color: var(--present); color: var(--present);" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); startGame('Daily')">⭐ PLAY DAILY CHALLENGE ⭐</button>
+                <button class="cat-btn-large" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); startGame('General')">🌍 General</button>
+                <button class="cat-btn-large" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); startGame('Science')">🔭 Science</button>
+                <button class="cat-btn-large" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); startGame('Chemistry')">🧪 Chemistry</button>
+                <button class="cat-btn-large" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); startGame('Biology')">🧬 Biology</button>
+                <button class="cat-btn-large" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); startGame('Zoology')">🦁 Zoology</button>
+                <button class="cat-btn-large" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); startGame('Astronomy')">🪐 Astronomy</button>
+                <button class="cat-btn-large" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); startGame('History')">🏛️ History</button>
+                <button class="cat-btn-large" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); startGame('Maths')">➗ Maths / JEE</button>
+                <button class="cat-btn-large" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); startGame('Music')">🎵 Music Tech</button>
+                <button class="cat-btn-large" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); startGame('Geopolitics')">🌐 Geopolitics</button>
+            </div>
         </div>
     </div>
 
