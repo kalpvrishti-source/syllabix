@@ -143,7 +143,7 @@
         }
 
         /* --- TRACKER / KEYBOARD STYLES --- */
-        .tracker-board { padding-top: 5px; pointer-events: none; } /* Disabled on PC */
+        .tracker-board { padding-top: 5px; pointer-events: none; } 
         .tracker-title { 
             font-size: 0.8rem; color: var(--text); opacity: 0.7; 
             text-align: center; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;
@@ -161,16 +161,19 @@
         .active-flash { transform: scale(0.85); filter: brightness(1.5); }
         .tk-key:active { transform: scale(0.9); } 
 
-        .tk-action { display: none; } /* Hides Enter/Backspace on PC */
+        .tk-action { display: none; } 
         
         .tk-correct { background-color: var(--correct) !important; color: #fff !important; border-color: var(--correct) !important; }
         .tk-present { background-color: var(--present) !important; color: #fff !important; border-color: var(--present) !important; }
         .tk-absent { background-color: transparent !important; opacity: 0.4; border-color: transparent !important; }
 
-        /* Modals */
+        /* --- ANTI-CHEAT MODALS --- */
         .modal {
             display: none; position: fixed; z-index: 10; left: 0; top: 0; width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.8); justify-content: center; align-items: center;
+            background-color: rgba(18, 18, 19, 0.95); /* Darker Background */
+            backdrop-filter: blur(15px); /* Heavy Blur prevents cheating */
+            -webkit-backdrop-filter: blur(15px);
+            justify-content: center; align-items: center;
         }
         .modal-content {
             background-color: var(--bg); color: var(--text); padding: 25px; border-radius: 8px;
@@ -412,7 +415,7 @@
             </div>
 
             <div class="settings-row">
-                <span class="settings-label">5-Min Countdown</span>
+                <span class="settings-label">5-Min Countdown Timer</span>
                 <label class="toggle-label"><input type="checkbox" id="countdownToggle" onchange="toggleCountdown(); triggerFeedback('ui-click');"> Enable</label>
             </div>
             
@@ -894,7 +897,6 @@
             setTimeout(() => { if(document.getElementById('message').textContent.includes('Subject')) showMsg(""); }, 2000);
         }
 
-        // --- NEW: CLEAN TOGGLE TIMER ---
         function toggleCountdown() {
             const willBeCountdown = document.getElementById('countdownToggle').checked;
             
@@ -962,7 +964,6 @@
             });
         }
 
-        // --- NEW: DUAL TIMER LOGIC ---
         function startTimer() {
             if(timerInt) clearInterval(timerInt); 
             startTime = Date.now();
@@ -980,7 +981,6 @@
                 const elapsed = Math.floor((Date.now() - startTime) / 1000);
                 
                 if (!isCountdown) {
-                    // Stopwatch Mode (Count Up)
                     const m = Math.floor(elapsed / 60).toString().padStart(2, '0');
                     const s = (elapsed % 60).toString().padStart(2, '0');
                     document.getElementById('timer').textContent = `${m}:${s}`;
@@ -990,7 +990,6 @@
                         toggleModal('timeHintModal');
                     }
                 } else {
-                    // Countdown Mode (5 Minutes)
                     const remaining = 300 - elapsed;
                     
                     if (remaining <= 0) {
