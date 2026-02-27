@@ -186,7 +186,7 @@
         .present { background-color: var(--present); border-color: var(--present); color: #fff; text-shadow: none;}
         .absent { background-color: var(--absent); border-color: var(--absent); color: var(--text);}
 
-        /* --- ANTI-CHEAT MODALS --- */
+        /* --- ANTI-CHEAT MODALS & SCROLL BARS --- */
         .modal {
             display: none; position: fixed; z-index: 10; left: 0; top: 0; width: 100%; height: 100%;
             background-color: rgba(10, 10, 10, 0.85); 
@@ -197,7 +197,10 @@
             background-color: rgba(18, 18, 19, 0.95); color: var(--text); padding: 25px; border-radius: 12px;
             max-width: 400px; width: 90%; border: 1px solid var(--correct);
             box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            max-height: 90vh; overflow-y: auto;
         }
+        .modal-content::-webkit-scrollbar { width: 4px; } 
+        .modal-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
         
         .settings-row {
             display: flex; justify-content: space-between; align-items: center;
@@ -205,6 +208,14 @@
         }
         .settings-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0;}
         .settings-label { font-weight: bold; font-size: 1rem; }
+        
+        select:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Stats & Level UI */
+        .level-header { text-align: center; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 15px;}
+        .xp-bar-container { width: 100%; background: var(--absent); height: 12px; border-radius: 6px; margin-top: 5px; overflow: hidden; border: 1px solid var(--border);}
+        .xp-bar-fill { background: linear-gradient(90deg, var(--present), var(--correct)); height: 100%; transition: width 0.8s cubic-bezier(0.25, 1, 0.5, 1); }
+        .xp-text { font-size: 0.8rem; margin-top: 6px; opacity: 0.7; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;}
 
         .stat-container { display: flex; justify-content: space-around; margin-bottom: 20px; text-align: center; gap: 10px;}
         .stat-box { display: flex; flex-direction: column; align-items: center; }
@@ -214,6 +225,26 @@
         .graph-num { width: 15px; }
         .graph-bar { background-color: var(--absent); height: 20px; margin-left: 10px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; min-width: 20px; transition: background-color 0.4s; border: 1px solid var(--border);}
         .graph-bar.highlight { background-color: var(--correct); color: #fff;}
+
+        .badges-container { 
+            display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-top: 15px; 
+            padding: 10px; background: rgba(0,0,0,0.3); border-radius: 8px; border: 1px solid var(--border);
+        }
+        .badge { 
+            display: flex; flex-direction: column; align-items: center; width: 65px; 
+            text-align: center; transition: transform 0.3s; 
+        }
+        .badge:hover { transform: scale(1.1); }
+        .badge-icon { 
+            font-size: 2rem; margin-bottom: 5px; 
+            filter: grayscale(100%) opacity(0.3); transition: all 0.5s; 
+        }
+        .badge.unlocked .badge-icon { 
+            filter: grayscale(0%) opacity(1); text-shadow: 0 0 15px rgba(255,255,255,0.4); 
+        }
+        .badge-name { font-size: 0.65rem; font-weight: bold; line-height: 1.2; opacity: 0.4; }
+        .badge.unlocked .badge-name { opacity: 1; color: var(--correct); }
+
 
         .dict-list { max-height: 250px; overflow-y: auto; text-align: left; font-size: 0.95rem; padding: 10px; border-radius: 5px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); }
         .dict-list p { margin: 8px 0; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
@@ -253,7 +284,7 @@
             padding: 8px 12px; border-radius: 8px; font-weight: bold; cursor: pointer; 
             font-size: 0.9rem; font-family: inherit; outline: none; transition: all 0.3s;
         }
-        select:hover { border-color: var(--correct); }
+        select:hover:not(:disabled) { border-color: var(--correct); }
         .toggle-label { display: flex; align-items: center; gap: 5px; cursor: pointer; font-weight: bold;}
 
         .flip { animation: flip 0.6s forwards; }
@@ -322,7 +353,6 @@
             
             <div class="cat-grid">
                 <button class="cat-btn-large" style="grid-column: 1 / -1; border-color: #9c27b0; color: #e1bee7; background: rgba(156, 39, 176, 0.2);" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); createChallengeLink()">🔗 Stump a Friend 🔗</button>
-
                 <button class="cat-btn-large" style="grid-column: 1 / -1; border-color: var(--present); color: var(--present);" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); startGame('Daily')">⭐ PLAY DAILY CHALLENGE ⭐</button>
                 
                 <button class="cat-btn-large" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); startGame('General')">🌍 General</button>
@@ -373,9 +403,9 @@
 
     <div class="header">
         <div class="header-left">
-            <button class="icon-btn" onclick="triggerFeedback('ui-click'); toggleModal('settingsModal')" title="Settings">⚙️</button>
+            <button class="icon-btn" onclick="triggerFeedback('ui-click'); openSettings()" title="Settings">⚙️</button>
             <button class="icon-btn" onclick="triggerFeedback('ui-click'); toggleModal('helpModal')" title="How to play">?</button>
-            <button class="icon-btn" onclick="triggerFeedback('ui-click'); openStats()" title="Statistics">📊</button>
+            <button class="icon-btn" onclick="triggerFeedback('ui-click'); openStats()" title="Statistics & Badges">📊</button>
             <button class="icon-btn" onclick="triggerFeedback('ui-click'); toggleModal('dictModal')" title="Word Examples">📚</button>
             <button class="icon-btn" onclick="triggerFeedback('ui-click'); openShareAppMenu()" title="Share or Download Game">📥</button>
             <button class="icon-btn" id="muteBtn" onclick="toggleMute()" title="Toggle Sound">🔊</button>
@@ -449,8 +479,8 @@
                 <span class="settings-label">Visual Theme</span>
                 <select id="themeSelect" onchange="triggerFeedback('ui-click'); changeTheme()">
                     <option value="default">🌙 Space</option>
-                    <option value="mars">🪐 Mars</option>
-                    <option value="hacker">💻 Hacker</option>
+                    <option value="mars" id="marsOption">🔒 Mars (Lvl 2)</option>
+                    <option value="hacker" id="hackerOption">🔒 Hacker (Lvl 3)</option>
                 </select>
             </div>
             
@@ -486,15 +516,29 @@
 
     <div id="statsModal" class="modal" onclick="triggerFeedback('ui-click'); toggleModal('statsModal')">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <h3 style="text-align: center; margin-top: 0;">STATISTICS</h3>
+            
+            <div class="level-header">
+                <h3 style="margin: 0; font-size: 1.5rem; color: var(--present);" id="player-level-title">LEVEL 1</h3>
+                <div class="xp-bar-container">
+                    <div id="xp-bar-fill" class="xp-bar-fill" style="width: 0%;"></div>
+                </div>
+                <div class="xp-text" id="xp-text-detail">0 / 50 XP</div>
+            </div>
+
+            <h4 style="margin-top: 20px; margin-bottom: 10px; text-align: center; letter-spacing: 1px;">STATISTICS</h4>
             <div class="stat-container">
                 <div class="stat-box"><span class="stat-num" id="stat-played">0</span><span class="stat-label">Played</span></div>
                 <div class="stat-box"><span class="stat-num" id="stat-winpct">0</span><span class="stat-label">Win %</span></div>
                 <div class="stat-box"><span class="stat-num" id="stat-streak" style="color: var(--correct);">0</span><span class="stat-label">🔥 Streak</span></div>
                 <div class="stat-box"><span class="stat-num" id="stat-maxstreak">0</span><span class="stat-label">👑 Best</span></div>
             </div>
-            <h4 style="margin-top: 20px; margin-bottom: 10px;">GUESS DISTRIBUTION</h4>
+            
+            <h4 style="margin-top: 25px; margin-bottom: 10px; text-align: center; letter-spacing: 1px;">GUESS DISTRIBUTION</h4>
             <div id="guess-distribution"></div>
+
+            <h4 style="margin-top: 30px; margin-bottom: 5px; text-align: center; letter-spacing: 1px; color: var(--present);">ACHIEVEMENTS</h4>
+            <div id="badges-container" class="badges-container"></div>
+
             <button class="action-btn btn-neutral" onclick="triggerFeedback('ui-click'); toggleModal('statsModal')" style="margin-top:20px; width: 100%; border-radius:8px;">Close</button>
         </div>
     </div>
@@ -675,6 +719,35 @@
             drawMars();
         }
 
+        function checkThemeLocks() {
+            const marsOpt = document.getElementById('marsOption');
+            const hackerOpt = document.getElementById('hackerOption');
+            const themeSelect = document.getElementById('themeSelect');
+            
+            if(stats.level >= 2) {
+                marsOpt.text = "🪐 Mars";
+                marsOpt.disabled = false;
+            } else {
+                marsOpt.text = "🔒 Mars (Lvl 2)";
+                marsOpt.disabled = true;
+                if(themeSelect.value === 'mars') themeSelect.value = 'default';
+            }
+
+            if(stats.level >= 3) {
+                hackerOpt.text = "💻 Hacker";
+                hackerOpt.disabled = false;
+            } else {
+                hackerOpt.text = "🔒 Hacker (Lvl 3)";
+                hackerOpt.disabled = true;
+                if(themeSelect.value === 'hacker') themeSelect.value = 'default';
+            }
+        }
+
+        function openSettings() {
+            checkThemeLocks();
+            toggleModal('settingsModal');
+        }
+
         function changeTheme() {
             const theme = document.getElementById('themeSelect').value;
             const metaTheme = document.getElementById('theme-color-meta');
@@ -696,7 +769,6 @@
             }
         }
 
-        // --- AUDIO ENGINE ---
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         let isMuted = false;
 
@@ -951,13 +1023,16 @@
         
         let stats = JSON.parse(localStorage.getItem('syllabix-stats-v2')) || { played: 0, won: 0, currentStreak: 0, maxStreak: 0, guesses: {1:0, 2:0, 3:0, 4:0, 5:0, 6:0} };
         if (!stats.daily) stats.daily = { date: "", status: "", attempts: 0, word: "" };
+        if (!stats.badges) stats.badges = { speed_demon: false, clutch: false, brainiac: false, night_owl: false, daily_master: false };
+        
+        // --- NEW: INITIALIZE XP TRACKER ---
+        if (typeof stats.xp === 'undefined') stats.xp = 0;
+        if (typeof stats.level === 'undefined') stats.level = 1;
 
-        // --- NEW: URL CHALLENGE DETECTION ---
         window.addEventListener('load', () => {
             startSpaceTheme(); 
             initBoardAndKeyboard(); 
             
-            // Check for Custom Challenge Link
             const urlParams = new URLSearchParams(window.location.search);
             const challenge = urlParams.get('challenge');
             
@@ -985,7 +1060,6 @@
             }
         });
 
-        // --- NEW: STUMP YOUR FRIENDS LOGIC ---
         function createChallengeLink() {
             let word = prompt("Enter a 5-letter word to challenge your friends:");
             if(word) {
@@ -995,7 +1069,6 @@
                     let currentUrl = window.location.href.split('?')[0];
                     const finalLink = `${currentUrl}?challenge=${encoded}`;
                     
-                    // Copy to clipboard
                     const tempInput = document.createElement("input");
                     tempInput.value = finalLink;
                     document.body.appendChild(tempInput);
@@ -1019,7 +1092,7 @@
             
             const catScreen = document.getElementById('category-screen');
             catScreen.style.display = 'none';
-            resetGame(true); // Pass true to PREVENT overwriting the targetWord
+            resetGame(true); 
             showMsg("🎯 You've been challenged! Guess the secret word.");
         }
 
@@ -1091,7 +1164,6 @@
             document.getElementById('pauseModal').style.display = 'none';
             triggerFeedback('ui-click');
             
-            // If they were playing a custom challenge, clear the URL so they can play normally
             if(currentCategory === "Custom Challenge") {
                 window.history.pushState({}, document.title, window.location.pathname);
             }
@@ -1106,7 +1178,6 @@
                 return;
             }
 
-            // Remove Custom mode if they pick something else
             if(category !== 'Custom Challenge') {
                 document.getElementById('customModeOption').style.display = "none";
                 window.history.pushState({}, document.title, window.location.pathname);
@@ -1149,7 +1220,7 @@
             }
             
             isCountdown = willBeCountdown;
-            resetGame(currentCategory === "Custom Challenge"); // preserve custom word if active
+            resetGame(currentCategory === "Custom Challenge"); 
             showMsg(isCountdown ? `Timer set to: 5 Min Countdown` : `Timer set to: Count Up`);
             setTimeout(() => { if(document.getElementById('message').textContent.includes('Timer')) showMsg(""); }, 2000);
         }
@@ -1280,7 +1351,6 @@
             showEndgameButtons();
         }
 
-        // Updated to support keeping a custom target word
         function resetGame(keepTarget = false) {
             if (!keepTarget) {
                 if (currentCategory === "Daily") {
@@ -1358,6 +1428,57 @@
             setTimeout(() => { rows[currentRow].classList.remove('shake'); }, 400); 
         }
 
+        // --- NEW: XP ENGINE & LEVEL UP LOGIC ---
+        function calculateAndAddXP(elapsedSecs) {
+            if(currentCategory === "Custom Challenge") return 0; 
+            
+            let xpGained = 10; // Base Win
+            if (currentCategory === "Daily") xpGained += 15;
+            if (elapsedSecs < 60) xpGained += 5;
+            
+            stats.xp += xpGained;
+            
+            // Level Thresholds
+            const lvl2Target = 50;
+            const lvl3Target = 150;
+            let levelUp = false;
+
+            if (stats.level === 1 && stats.xp >= lvl2Target) { stats.level = 2; levelUp = true; }
+            if (stats.level === 2 && stats.xp >= lvl3Target) { stats.level = 3; levelUp = true; }
+
+            localStorage.setItem('syllabix-stats-v2', JSON.stringify(stats));
+
+            return { xpGained, levelUp };
+        }
+
+        function checkAchievements(elapsedSecs) {
+            if(currentCategory === "Custom Challenge") return; 
+            
+            let unlockedAny = false;
+            let newlyUnlocked = [];
+
+            if(!stats.badges.speed_demon && elapsedSecs < 60) {
+                stats.badges.speed_demon = true; newlyUnlocked.push("Speed Demon ⚡"); unlockedAny = true;
+            }
+            if(!stats.badges.clutch && currentRow === 5) {
+                stats.badges.clutch = true; newlyUnlocked.push("Clutch 😰"); unlockedAny = true;
+            }
+            if(!stats.badges.brainiac && stats.currentStreak >= 2) {
+                stats.badges.brainiac = true; newlyUnlocked.push("Brainiac 🧠"); unlockedAny = true;
+            }
+            const hour = new Date().getHours();
+            if(!stats.badges.night_owl && hour >= 0 && hour < 4) {
+                stats.badges.night_owl = true; newlyUnlocked.push("Night Owl 🦉"); unlockedAny = true;
+            }
+            if(!stats.badges.daily_master && currentCategory === "Daily") {
+                stats.badges.daily_master = true; newlyUnlocked.push("Daily Master ⭐"); unlockedAny = true;
+            }
+
+            if(unlockedAny) {
+                setTimeout(() => { showMsg(`Unlocked: ${newlyUnlocked.join(", ")}!`); }, 2000); 
+            }
+        }
+
         async function submitGuess() {
             const guess = guesses[currentRow];
             
@@ -1395,7 +1516,19 @@
                 freezeTime();
                 clearInterval(timerInt);
                 triggerFeedback('win');
-                showMsg("Impressive! 🎉");
+                
+                const elapsedSecs = Math.floor((Date.now() - startTime) / 1000);
+                const { xpGained, levelUp } = calculateAndAddXP(elapsedSecs);
+                checkAchievements(elapsedSecs);
+
+                let winMsg = "Impressive! 🎉";
+                if(xpGained > 0) winMsg = `Impressive! 🎉 (+${xpGained} XP)`;
+                showMsg(winMsg);
+                
+                if (levelUp) {
+                    setTimeout(() => { showMsg(`LEVEL UP! You are now Level ${stats.level}! 🚀`); triggerFeedback('win'); }, 4000);
+                }
+
                 fireConfetti();
                 if (currentCategory === "Daily") stats.daily = { date: new Date().toLocaleDateString(), status: "won", attempts: currentRow + 1, word: targetWord };
                 saveStats(true);
@@ -1450,7 +1583,6 @@
         function fireConfetti() { confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, zIndex: 1000 }); }
 
         function saveStats(won) {
-            // Don't save stats for custom friend challenges to not ruin player's true win rate
             if(currentCategory === "Custom Challenge") return; 
 
             stats.played++;
@@ -1466,6 +1598,22 @@
         }
 
         function openStats() {
+            // Populate XP Bar
+            document.getElementById('player-level-title').textContent = `LEVEL ${stats.level}`;
+            const xpText = document.getElementById('xp-text-detail');
+            const xpFill = document.getElementById('xp-bar-fill');
+            
+            if (stats.level === 1) {
+                xpText.textContent = `${stats.xp} / 50 XP`;
+                xpFill.style.width = `${(stats.xp / 50) * 100}%`;
+            } else if (stats.level === 2) {
+                xpText.textContent = `${stats.xp} / 150 XP`;
+                xpFill.style.width = `${(stats.xp / 150) * 100}%`;
+            } else {
+                xpText.textContent = `${stats.xp} XP (MAX LEVEL)`;
+                xpFill.style.width = `100%`;
+            }
+
             document.getElementById('stat-played').textContent = stats.played;
             document.getElementById('stat-winpct').textContent = stats.played === 0 ? 0 : Math.round((stats.won / stats.played) * 100);
             document.getElementById('stat-streak').textContent = stats.currentStreak || 0;
@@ -1491,6 +1639,29 @@
                 row.appendChild(num); row.appendChild(bar);
                 distContainer.appendChild(row);
             }
+
+            const badgesData = [
+                { id: 'speed_demon', icon: '⚡', name: 'Speed Demon' },
+                { id: 'clutch', icon: '😰', name: 'Clutch' },
+                { id: 'brainiac', icon: '🧠', name: 'Brainiac' },
+                { id: 'night_owl', icon: '🦉', name: 'Night Owl' },
+                { id: 'daily_master', icon: '⭐', name: 'Daily Master' }
+            ];
+            
+            const badgesContainer = document.getElementById('badges-container');
+            badgesContainer.innerHTML = '';
+            
+            badgesData.forEach(b => {
+                const isUnlocked = stats.badges[b.id];
+                const badgeEl = document.createElement('div');
+                badgeEl.className = `badge ${isUnlocked ? 'unlocked' : ''}`;
+                badgeEl.innerHTML = `
+                    <div class="badge-icon" title="${b.name}">${b.icon}</div>
+                    <div class="badge-name">${b.name}</div>
+                `;
+                badgesContainer.appendChild(badgeEl);
+            });
+
             toggleModal('statsModal');
         }
 
@@ -1527,7 +1698,7 @@
             let timeLabel = finalTimeStr;
             if (isCountdown) timeLabel += " (Timed)";
             
-            const text = `Syllabix [${currentCategory}] ${currentRow === 6 && guesses[5] !== targetWord ? 'X' : currentRow + 1}/6 ⏱️ ${timeLabel}\n🔥 Streak: ${stats.currentStreak}\n\n${boardEmoji.join('\n')}`;
+            const text = `Syllabix [${currentCategory}] ${currentRow === 6 && guesses[5] !== targetWord ? 'X' : currentRow + 1}/6 ⏱️ ${timeLabel}\n⭐ Level: ${stats.level}\n\n${boardEmoji.join('\n')}`;
             navigator.clipboard.writeText(text);
             showMsg("Results copied to clipboard!");
             setTimeout(() => { if(document.getElementById('message').textContent === "Results copied to clipboard!") showMsg(""); }, 2000);
