@@ -49,7 +49,7 @@
         }
 
         body {
-            background-color: transparent; /* Made transparent so the canvas shows through! */
+            background-color: transparent; 
             color: var(--text);
             font-family: 'Helvetica Neue', Arial, sans-serif;
             display: flex; flex-direction: column; align-items: center;
@@ -148,13 +148,12 @@
         #game-container { display: flex; flex-direction: column; align-items: center; }
         .row { display: grid; grid-template-columns: repeat(5, 1fr); grid-gap: 6px; margin-bottom: 6px; }
         
-        /* PREMIUM GLASS TILES */
         .tile {
             width: 60px; height: 60px; border: 2px solid var(--border);
             display: flex; justify-content: center; align-items: center;
             font-size: 2rem; font-weight: bold; text-transform: uppercase;
             transition: border-color 0.4s, background-color 0.4s;
-            background-color: rgba(0,0,0,0.4); /* Glass effect over moving background */
+            background-color: rgba(0,0,0,0.4); 
             backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
             text-shadow: 0 2px 4px rgba(0,0,0,0.8);
         }
@@ -180,7 +179,6 @@
 
         .tk-action { display: none; } 
         
-        /* When colors apply, make them solid so they pop */
         .tk-correct { background-color: var(--correct) !important; color: #fff !important; border-color: var(--correct) !important; text-shadow: none;}
         .tk-present { background-color: var(--present) !important; color: #fff !important; border-color: var(--present) !important; text-shadow: none;}
         .tk-absent { background-color: rgba(0,0,0,0.8) !important; opacity: 0.6; border-color: transparent !important; }
@@ -323,7 +321,10 @@
             <div class="cat-screen-sub">Select a category to start the game</div>
             
             <div class="cat-grid">
+                <button class="cat-btn-large" style="grid-column: 1 / -1; border-color: #9c27b0; color: #e1bee7; background: rgba(156, 39, 176, 0.2);" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); createChallengeLink()">🔗 Stump a Friend 🔗</button>
+
                 <button class="cat-btn-large" style="grid-column: 1 / -1; border-color: var(--present); color: var(--present);" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); startGame('Daily')">⭐ PLAY DAILY CHALLENGE ⭐</button>
+                
                 <button class="cat-btn-large" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); startGame('General')">🌍 General</button>
                 <button class="cat-btn-large" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); startGame('Science')">🔭 Science</button>
                 <button class="cat-btn-large" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); startGame('Chemistry')">🧪 Chemistry</button>
@@ -425,6 +426,7 @@
                 <span class="settings-label">Subject</span>
                 <select id="categorySelect" onchange="triggerFeedback('ui-click'); changeCategoryMidGame()">
                     <option value="Daily">⭐ Daily Challenge</option>
+                    <option id="customModeOption" value="Custom Challenge" style="display:none;">🎯 Custom Challenge</option>
                     <option value="General">General</option>
                     <option value="Science">Science</option>
                     <option value="Chemistry">Chemistry</option>
@@ -588,7 +590,6 @@
                     if(p.y < 0) p.y = bgCanvas.height; if(p.y > bgCanvas.height) p.y = 0;
                 });
                 
-                // Occasional comet
                 if(Math.random() > 0.995) {
                     bgCtx.beginPath();
                     let cx = Math.random() * bgCanvas.width;
@@ -599,7 +600,6 @@
                     bgCtx.lineWidth = 2;
                     bgCtx.stroke();
                 }
-                
                 bgAnimationId = requestAnimationFrame(drawSpace);
             }
             drawSpace();
@@ -639,7 +639,7 @@
                     x: Math.random() * bgCanvas.width,
                     y: Math.random() * bgCanvas.height,
                     r: Math.random() * 3 + 1,
-                    dx: Math.random() * 3 + 0.5, // Wind blowing right
+                    dx: Math.random() * 3 + 0.5, 
                     dy: (Math.random() - 0.5) * 1
                 });
             }
@@ -651,7 +651,6 @@
                 bgCtx.fillStyle = grad;
                 bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
 
-                // Silhouette terrain
                 bgCtx.fillStyle = '#150604';
                 bgCtx.beginPath();
                 bgCtx.moveTo(0, bgCanvas.height);
@@ -922,19 +921,19 @@
         }
 
         const CATEGORIES = {
-            "General": ["REACT", "APPLE", "SMART", "WORLD", "GHOST", "CHESS", "BOARD", "HOUSE", "WATER", "MONEY", "PAPER", "CLOCK", "TRAIN", "GLASS", "CHAIR", "TABLE", "BREAD", "RIVER", "HEART", "LIGHT", "DREAM", "PLANT", "EARTH", "NIGHT", "STORY", "GUEST", "MONTH", "POWER", "VOICE", "VIDEO"],
-            "Science": ["ATOMS", "FORCE", "LASER", "FLUID", "SOLID", "PHASE", "LIGHT", "SOUND", "POWER", "PRISM", "OPTIC", "WAVES", "SCALE", "QUARK", "GRAVY", "SPEED", "MASS", "DENSE", "VOLTS", "WATTS", "JOULE", "HERTZ", "SPACE", "LOGIC", "MODEL", "STUDY", "TESTS", "METER"],
-            "Chemistry": ["AMINE", "AMIDE", "ESTER", "ETHER", "BONDS", "MOLAR", "IONIC", "GASES", "OZONE", "RADON", "ACIDS", "BASES", "YIELD", "ALLOY", "ANION", "ARGON", "BORON", "BUTYL", "FLASK", "LIPID", "METAL", "OXIDE", "POLAR", "RESIN", "SOLVE", "TOXIC", "VAPOR", "XENON"],
-            "Biology": ["CELLS", "BLOOD", "BRAIN", "HEART", "VEINS", "SKULL", "PLANT", "VIRUS", "YEAST", "FUNGI", "SPORE", "GENES", "NERVE", "ALGAE", "AORTA", "BONES", "CLONE", "FAUNA", "FLORA", "GLAND", "LIVER", "LUNGS", "ORGAN", "PETAL", "PULSE", "PUPIL", "ROOTS", "SPINE", "TRAIT"],
-            "Zoology": ["TIGER", "EAGLE", "SNAKE", "SHARK", "WHALE", "BEARS", "LIONS", "FROGS", "BIRDS", "HORSE", "RHINO", "HIPPO", "MOOSE", "ZEBRA", "CAMEL", "CHIMP", "CRABS", "GOOSE", "HYENA", "LEMUR", "LLAMA", "MACAW", "PANDA", "SHEEP", "SKUNK", "SLOTH", "SNAIL", "SQUID", "SWANS"],
-            "Astronomy": ["VENUS", "MARS", "STARS", "MOONS", "SOLAR", "LUNAR", "SPACE", "ORBIT", "COMET", "ALIEN", "ASTRO", "BLACK", "HOLES", "DWARF", "FLARE", "LIGHT", "MILKY", "NOVA", "PLUTO", "PROBE", "ROVER", "TITAN", "NEBULA"],
-            "History": ["INDUS", "CIVIL", "RUINS", "TOMBS", "KINGS", "MYTHS", "ROMAN", "GREEK", "STONE", "TRIBE", "CRAFT", "TOOLS", "AZTEC", "CROWN", "EGYPT", "EMIRE", "GLORY", "HONOR", "INCA", "MAYAN", "NOBLE", "PEACE", "QUEEN", "REBEL", "ROYAL", "SWORD", "TREAT"],
-            "Music": ["AUDIO", "TRACK", "BEATS", "MIXER", "TEMPO", "CHORD", "VOCAL", "SYNTH", "SOUND", "VINYL", "TUNES", "BANJO", "BASS", "BRASS", "CELLO", "CHOIR", "DANCE", "FLUTE", "LYRIC", "PIANO", "RADIO", "SONGS", "STAGE", "STRUM", "VOCAL", "WALTZ"],
-            "Maths": ["GRAPH", "CURVE", "SLOPE", "RATIO", "AXIOM", "PROVE", "EQUAL", "LIMIT", "ANGLE", "DIGIT", "PRIME", "ARRAY", "CUBES", "EXACT", "INDEX", "LOGIC", "MINUS", "MODEL", "POINT", "SCALE", "SOLVE", "STATS", "TALLY", "TORUS", "VALID", "VALUE"],
-            "Geopolitics": ["TRADE", "POWER", "TREAT", "ALLYS", "ASIAN", "STATE", "WORLD", "NAVAL", "PEACE", "CLASH", "SPIES", "ALARM", "ASSET", "BOMBS", "CIVIL", "CLAIM", "COURT", "CRISIS", "CROWN", "DRAFT", "ELITE", "ENEMY", "FORCE", "FORUM", "GUARD", "LAW", "UNION", "VOTER"]
+            "General": ["REACT", "APPLE", "SMART", "WORLD", "GHOST", "CHESS", "BOARD", "HOUSE", "WATER", "MONEY", "PAPER", "CLOCK", "TRAIN", "GLASS", "CHAIR", "TABLE", "BREAD", "RIVER", "HEART", "LIGHT", "DREAM", "PLANT", "EARTH", "NIGHT", "STORY", "GUEST", "MONTH", "POWER", "VOICE", "VIDEO", "FRAME", "BRICK", "STONE", "METAL", "SUGAR", "FRUIT", "SWEET", "SMILE", "LAUGH", "DANCE", "SLEEP", "WATCH", "DRINK", "BROWN", "BLACK", "WHITE", "GREEN", "PIECE", "CROWD", "MATCH", "SPORT", "BEACH", "OCEAN", "CLOUD", "STORM", "WINDY", "FLAME", "SMOKE", "NOISE", "QUIET", "MAGIC", "TRICK", "PRIZE", "PAINT", "BRUSH", "MUSIC", "SOUND", "TASTE", "TOUCH", "SMELL", "PHONE", "DRIVE"],
+            "Science": ["ATOMS", "FORCE", "LASER", "FLUID", "SOLID", "PHASE", "LIGHT", "SOUND", "POWER", "PRISM", "OPTIC", "WAVES", "SCALE", "QUARK", "SPEED", "MASS", "DENSE", "VOLTS", "WATTS", "JOULE", "HERTZ", "SPACE", "LOGIC", "MODEL", "STUDY", "TESTS", "METER", "BOSON", "GLUON", "ORBIT", "ROTOR", "MOTOR", "GEARS", "LEVER", "PIVOT", "PULSE", "RAYON", "RESIN", "GLASS", "METAL", "ALLOY", "OZONE", "MACRO", "MICRO", "FLASK", "BEAMS", "XRAYS", "GAMMA", "SOLAR", "LUNAR", "DATA", "GRAPH", "CHART"],
+            "Chemistry": ["AMINE", "AMIDE", "ESTER", "ETHER", "BONDS", "MOLAR", "IONIC", "GASES", "OZONE", "RADON", "ACIDS", "BASES", "YIELD", "ALLOY", "ANION", "ARGON", "BORON", "BUTYL", "FLASK", "LIPID", "METAL", "OXIDE", "POLAR", "RESIN", "SOLVE", "TOXIC", "VAPOR", "XENON", "VINYL", "ALKYL", "AZIDE", "BERYL", "BROMO", "CHLOR", "EPOXY", "IMINE", "LATEX", "PLANT", "PROXY", "SULFA", "TITAN", "CARBO", "SALTS", "ATOMS", "FLUID", "SOLID", "PHASE"],
+            "Biology": ["CELLS", "BLOOD", "BRAIN", "HEART", "VEINS", "SKULL", "PLANT", "VIRUS", "YEAST", "FUNGI", "SPORE", "GENES", "NERVE", "ALGAE", "AORTA", "BONES", "CLONE", "FAUNA", "FLORA", "GLAND", "LIVER", "LUNGS", "ORGAN", "PETAL", "PULSE", "PUPIL", "ROOTS", "SPINE", "TRAIT", "BIOME", "CILIA", "FLUID", "GILLS", "MACRO", "MICRO", "MUCUS", "OVARY", "OVULE", "SCALE", "SHELL", "SKINS", "STEMS", "THORN", "SEEDS", "GERMS", "MOLDS", "MOTHS", "MITES", "WEEDS", "LEAFS", "FLESH"],
+            "Zoology": ["TIGER", "EAGLE", "SNAKE", "SHARK", "WHALE", "BEARS", "LIONS", "FROGS", "BIRDS", "HORSE", "RHINO", "HIPPO", "MOOSE", "ZEBRA", "CAMEL", "CHIMP", "CRABS", "GOOSE", "HYENA", "LEMUR", "LLAMA", "MACAW", "PANDA", "SHEEP", "SKUNK", "SLOTH", "SNAIL", "SQUID", "SWANS", "BISON", "DINGO", "GECKO", "HERON", "KOALA", "OTTER", "PUPPY", "RAVEN", "ROBIN", "SEALS", "SLUGS", "STORK", "SWINE", "TAPIR", "TOADS", "TROUT", "VIPER", "WASPS", "WORMS", "MOUSE", "HOUND"],
+            "Astronomy": ["VENUS", "MARS", "STARS", "MOONS", "SOLAR", "LUNAR", "SPACE", "ORBIT", "COMET", "ALIEN", "ASTRO", "BLACK", "HOLES", "DWARF", "FLARE", "LIGHT", "MILKY", "NOVA", "PLUTO", "PROBE", "ROVER", "TITAN", "DUSTS", "EARTH", "GLOBE", "NIGHT", "SKIES", "POLAR", "RINGS", "SHINE", "BLAZE", "GLINT", "SUNS", "ROCKS", "VOID", "WORLD", "REALM", "COMAS", "NOVAS"],
+            "History": ["INDUS", "CIVIL", "RUINS", "TOMBS", "KINGS", "MYTHS", "ROMAN", "GREEK", "STONE", "TRIBE", "CRAFT", "TOOLS", "AZTEC", "CROWN", "EGYPT", "GLORY", "HONOR", "INCAS", "MAYAN", "NOBLE", "PEACE", "QUEEN", "REBEL", "ROYAL", "SWORD", "TREAT", "ARMOR", "ARROW", "FORTS", "SPEAR", "LANCE", "FLEET", "SIEGE", "SLAVE", "CHIEF", "BARON", "MANOR", "RULER", "REALM", "MARCH", "TROOP", "BOWS", "CLANS", "SHIPS", "BOATS", "GUNS", "RIFLE"],
+            "Music": ["AUDIO", "TRACK", "BEATS", "MIXER", "TEMPO", "CHORD", "VOCAL", "SYNTH", "SOUND", "VINYL", "TUNES", "BANJO", "BASS", "BRASS", "CELLO", "CHOIR", "DANCE", "FLUTE", "LYRIC", "PIANO", "RADIO", "SONGS", "STAGE", "STRUM", "WALTZ", "BLUES", "CLEFS", "NOTES", "PITCH", "SCALE", "SNARE", "HORNS", "REEDS", "BANDS", "CHANT", "OPERA", "VOICE", "ALBUM", "DRUMS", "HARPS", "CHIME", "BELLS", "LUTES"],
+            "Maths": ["GRAPH", "CURVE", "SLOPE", "RATIO", "AXIOM", "PROVE", "EQUAL", "LIMIT", "ANGLE", "DIGIT", "PRIME", "ARRAY", "CUBES", "EXACT", "INDEX", "LOGIC", "MINUS", "MODEL", "POINT", "SCALE", "SOLVE", "STATS", "TALLY", "TORUS", "VALID", "VALUE", "MATHS", "ROOTS", "SINES", "CONES", "LINES", "PLANE", "SHAPE", "WIDTH", "DEPTH", "RULES", "TERMS", "PROOF", "POLAR", "RADII", "LOCUS", "TENS", "ONES", "ZEROS", "SIGNS", "PLUS", "ADDED", "TOTAL"],
+            "Geopolitics": ["TRADE", "POWER", "TREAT", "ALLYS", "ASIAN", "STATE", "WORLD", "NAVAL", "PEACE", "CLASH", "SPIES", "ALARM", "ASSET", "BOMBS", "CIVIL", "CLAIM", "COURT", "CRASH", "CROWN", "DRAFT", "ELITE", "ENEMY", "FORCE", "FORUM", "GUARD", "UNION", "VOTER", "ALLY", "BLOCK", "BRIBE", "CABAL", "CHIEF", "CUBAN", "DEALS", "FLEET", "FRAUD", "FUNDS", "JUNTA", "MAYOR", "MEDIA", "MONEY", "PACT", "PARTY", "PRESS", "REBEL", "RIGHT", "RIVAL", "RULER", "SEALS", "SIEGE", "SMUG", "TAXES", "TROOP", "TRUST", "UNITE"]
         };
 
-        const COMMON_WORDS_STRING = "ABOUT,ABOVE,ACTOR,ACUTE,ADAPT,ADMIT,ADOPT,ADULT,AFTER,AGAIN,AGENT,AGREE,AHEAD,ALARM,ALBUM,ALERT,ALIEN,ALIGN,ALIKE,ALIVE,ALLOW,ALONE,ALONG,ALTER,AMONG,ANGER,ANGLE,ANGRY,APPLE,APPLY,ARENA,ARGUE,ARISE,ARRAY,ARROW,ASIAN,ASIDE,ASSET,AUDIO,AUDIT,AVOID,AWAKE,AWARD,AWARE,BACON,BAKER,BASIC,BASIN,BASIS,BATCH,BEACH,BEARD,BEAST,BEGIN,BEING,BELOW,BENCH,BILLY,BIRTH,BLACK,BLADE,BLAME,BLANK,BLIND,BLOCK,BOARD,BOAST,BONUS,BOOST,BOOTH,BOUND,BRAIN,BRAKE,BRAND,BREAD,BREAK,BREED,BRICK,BRIDE,BRIEF,BRING,BROAD,BROKE,BROWN,BRUSH,BUILD,BUILT,BUYER,CABIN,CABLE,CATCH,CAUSE,CHAIN,CHAIR,CHART,CHASE,CHEAP,CHECK,CHEEK,CHEER,CHESS,CHEST,CHIEF,CHILD,CHINA,CHOIR,CHOSE,CIVIC,CIVIL,CLAIM,CLASS,CLEAN,CLEAR,CLERK,CLICK,CLOCK,CLOSE,COACH,COAST,COLON,COLOR,COMIC,CORAL,COTTON,COUCH,COULD,COUNT,COURT,COVER,CRACK,CRAFT,CRAZY,CREAM,CROSS,CROWD,CROWN,CURVE,CYCLE,DAILY,DANCE,DATED,DEALT,DEBUT,DELAY,DEPTH,DIARY,DIGIT,DISCO,DITCH,DONOR,DOUBT,DRAFT,DRAMA,DRAWN,DREAM,DRESS,DRILL,DRINK,DRIVE,EAGER,EAGLE,EARLY,EARTH,EIGHT,ELITE,EMPTY,ENJOY,ENTER,ENTRY,EQUAL,ERROR,ESSAY,EVENT,EVERY,EXACT,EXIST,EXTRA,FAITH,FALSE,FAULT,FIBER,FIELD,FIFTH,FIFTY,FIGHT,FINAL,FIRST,FIXED,FLASH,FLEET,FLIGHT,FLOOR,FLOUR,FLUID,FOCUS,FORCE,FORTH,FORTY,FORUM,FOUND,FRAME,FRESH,FRONT,FRUIT,FULLY,FUNNY,GIANT,GIVEN,GLASS,GLOBE,GLORY,GOING,GRACE,GRADE,GRAND,GRANT,GRASS,GREAT,GREEN,GROSS,GROUP,GROWN,GUARD,GUESS,GUEST,GUIDE,HABIT,HAPPY,HARSH,HEART,HEAVY,HELLO,HENCE,HORSE,HOTEL,HOUSE,HUMAN,IDEAL,IMAGE,INDEX,INNER,INPUT,ISSUE,JOINT,JUDGE,JUICE,KNOWN,LABEL,LABOR,LARGE,LATER,LAUGH,LAYER,LEARN,LEASE,LEAST,LEAVE,LEGAL,LEMON,LEVEL,LIGHT,LIMIT,LINEN,LOCAL,LOGIC,LOOSE,LOWER,LUCKY,LUNCH,MAGIC,MAJOR,MAKER,MARCH,MARRY,MATCH,MAYBE,MAYOR,MEANT,MEDIA,MERIT,METAL,METER,MIGHT,MINOR,MINUS,MIXED,MODEL,MONEY,MONTH,MORAL,MOTOR,MOUNT,MOUSE,MOUTH,MOVIE,MUSIC,NEEDS,NEVER,NEWLY,NIGHT,NOISE,NORTH,NOVEL,NURSE,OCCUR,OCEAN,OFFER,OFTEN,ONION,ORDER,ORGAN,OTHER,OUGHT,OUNCE,OUTER,OWNER,PANEL,PAPER,PARTY,PATCH,PEACE,PHASE,PHONE,PHOTO,PIANO,PIECE,PILOT,PITCH,PLACE,PLAIN,PLANE,PLANT,PLATE,POINT,POUND,POWER,PRESS,PRICE,PRIDE,PRIME,PRINT,PRIOR,PRIZE,PROOF,PROUD,PROVE,QUEEN,QUICK,QUIET,QUITE,RADIO,RAISE,RANGE,RAPID,RATIO,REACH,REACT,READY,REALM,REBEL,REFER,RELAX,RELAY,REPLY,RIGHT,RIVER,ROMAN,ROUGH,ROUND,ROUTE,ROYAL,RURAL,SCALE,SCENE,SCOPE,SCORE,SENSE,SERVE,SETUP,SEVEN,SHALL,SHAPE,SHARE,SHARP,SHEET,SHELF,SHELL,SHIFT,SHIRT,SHOCK,SHOOT,SHORT,SHOWN,SIGHT,SINCE,SIXTH,SIXTY,SKILL,SLEEP,SLIDE,SMALL,SMART,SMILE,SMITH,SMOKE,SOLID,SOLVE,SORRY,SOUND,SOUTH,SPACE,SPARE,SPEAK,SPEED,SPELL,SPEND,SPENT,SPLIT,SPOKE,SPORT,STAFF,STAGE,STAND,START,STATE,STEAM,STEEL,STICK,STILL,STOCK,STONE,STOOD,STORE,STORM,STORY,STRIP,STUCK,STUDY,STUFF,STYLE,SUGAR,SUPER,SWEET,TABLE,TAKEN,TASTE,TAXES,TEACH,TEETH,TENTH,TEXAS,THANK,THEIR,THEME,THERE,THESE,THICK,THING,THINK,THIRD,THOSE,THREE,THREW,THROW,TIGER,TIGHT,TIMES,TITLE,TODAY,TOPIC,TOTAL,TOUCH,TOUGH,TOWER,TRACK,TRADE,TRAIN,TREAT,TREND,TRIAL,TRIBE,TRICK,TRUCK,TRULY,TRUST,TRUTH,TWICE,UNDER,UNION,UNITY,UNTIL,UPPER,UPSET,URBAN,USAGE,USUAL,VALID,VALUE,VIDEO,VIRUS,VISIT,VITAL,VOICE,VOTER,WAGON,WASTE,WATCH,WATER,WHEEL,WHERE,WHICH,WHILE,WHITE,WHOLE,WHOSE,WOMAN,WOMEN,WORDS,WORLD,WORRY,WORSE,WORST,WORTH,WOULD,WOUND,WRITE,WRONG,YIELD,YOUNG,YOUTH";
+        const COMMON_WORDS_STRING = "ABOUT,ABOVE,ACTOR,ACUTE,ADAPT,ADMIT,ADOPT,ADULT,AFTER,AGAIN,AGENT,AGREE,AHEAD,ALARM,ALBUM,ALERT,ALIEN,ALIGN,ALIKE,ALIVE,ALLOW,ALONE,ALONG,ALTER,AMONG,ANGER,ANGLE,ANGRY,APPLE,APPLY,ARENA,ARGUE,ARISE,ARRAY,ARROW,ASIAN,ASIDE,ASSET,AUDIO,AUDIT,AVOID,AWAKE,AWARD,AWARE,BACON,BAKER,BASIC,BASIN,BASIS,BATCH,BEACH,BEARD,BEAST,BEGIN,BEING,BELOW,BENCH,BILLY,BIRTH,BLACK,BLADE,BLAME,BLANK,BLIND,BLOCK,BOARD,BOAST,BONUS,BOOST,BOOTH,BOUND,BRAIN,BRAKE,BRAND,BREAD,BREAK,BREED,BRICK,BRIDE,BRIEF,BRING,BROAD,BROKE,BROWN,BRUSH,BUILD,BUILT,BUYER,CABIN,CABLE,CATCH,CAUSE,CHAIN,CHAIR,CHART,CHASE,CHEAP,CHECK,CHEEK,CHEER,CHESS,CHEST,CHIEF,CHILD,CHINA,CHOIR,CHOSE,CIVIC,CIVIL,CLAIM,CLASS,CLEAN,CLEAR,CLERK,CLICK,CLOCK,CLOSE,COACH,COAST,COLON,COLOR,COMIC,CORAL,COTTON,COUCH,COULD,COUNT,COURT,COVER,CRACK,CRAFT,CRAZY,CREAM,CROSS,CROWD,CROWN,CURVE,CYCLE,DAILY,DANCE,DATED,DEALT,DEBUT,DELAY,DEPTH,DIARY,DIGIT,DISCO,DITCH,DONOR,DOUBT,DRAFT,DRAMA,DRAWN,DREAM,DRESS,DRILL,DRINK,DRIVE,EAGER,EAGLE,EARLY,EARTH,EIGHT,ELITE,EMPTY,ENJOY,ENTER,ENTRY,EQUAL,ERROR,ESSAY,EVENT,EVERY,EXACT,EXIST,EXTRA,FAITH,FALSE,FAULT,FIBER,FIELD,FIFTH,FIFTY,FIGHT,FINAL,FIRST,FIXED,FLASH,FLEET,FLIGHT,FLOOR,FLOUR,FLUID,FOCUS,FORCE,FORTH,FORTY,FORUM,FOUND,FRAME,FRESH,FRONT,FRUIT,FULLY,FUNNY,GIANT,GIVEN,GLASS,GLOBE,GLORY,GOING,GRACE,GRADE,GRAND,GRANT,GRASS,GREAT,GREEN,GROSS,GROUP,GROWN,GUARD,GUESS,GUEST,GUIDE,HABIT,HAPPY,HARSH,HEART,HEAVY,HELLO,HENCE,HORSE,HOTEL,HOUSE,HUMAN,IDEAL,IMAGE,INDEX,INNER,INPUT,ISSUE,JOINT,JUDGE,JUICE,KNOWN,LABEL,LABOR,LARGE,LATER,LAUGH,LAYER,LEARN,LEASE,LEAST,LEAVE,LEGAL,LEMON,LEVEL,LIGHT,LIMIT,LINEN,LOCAL,LOGIC,LOOSE,LOWER,LUCKY,LUNCH,MAGIC,MAJOR,MAKER,MARCH,MARRY,MATCH,MAYBE,MAYOR,MEANT,MEDIA,MERIT,METAL,METER,MIGHT,MINOR,MINUS,MIXED,MODEL,MONEY,MONTH,MORAL,MOTOR,MOUNT,MOUSE,MOUTH,MOVIE,MUSIC,NEEDS,NEVER,NEWLY,NIGHT,NOISE,NORTH,NOVEL,NURSE,OCCUR,OCEAN,OFFER,OFTEN,ONION,ORDER,ORGAN,OTHER,OUGHT,OUNCE,OUTER,OWNER,PANEL,PAPER,PARTY,PATCH,PEACE,PHASE,PHONE,PHOTO,PIANO,PIECE,PILOT,PITCH,PLACE,PLAIN,PLANE,PLANT,PLATE,POINT,POUND,POWER,PRESS,PRICE,PRIDE,PRIME,PRINT,PRIOR,PRIZE,PROOF,PROUD,PROVE,QUEEN,QUICK,QUIET,QUITE,RADIO,RAISE,RANGE,RAPID,RATIO,REACH,REACT,READY,REALM,REBEL,REFER,RELAX,RELAY,REPLY,RIGHT,RIVER,ROMAN,ROUGH,ROUND,ROUTE,ROYAL,RURAL,SCALE,SCENE,SCOPE,SCORE,SENSE,SERVE,SETUP,SEVEN,SHALL,SHAPE,SHARE,SHARP,SHEET,SHELF,SHELL,SHIFT,SHIRT,SHOCK,SHOOT,SHORT,SHOWN,SIGHT,SINCE,SIXTH,SIXTY,SKILL,SLEEP,SLIDE,SMALL,SMART,SMILE,SMITH,SMOKE,SOLID,SOLVE,SORRY,SOUND,SOUTH,SPACE,SPARE,SPEAK,SPEED,SPELL,SPEND,SPENT,SPLIT,SPOKE,SPORT,STAFF,STAGE,STAND,START,STATE,STEAM,STEEL,STICK,STILL,STOCK,STONE,STOOD,STORE,STORM,STORY,STRIP,STUCK,STUDY,STUFF,STYLE,SUGAR,SUPER,SWEET,TABLE,TAKEN,TASTE,TAXES,TEACH,TEETH,TENTH,TEXAS,THANK,THEIR,THEME,THERE,THESE,THICK,THING,THINK,THIRD,THOSE,THREE,THREW,THROW,TIGER,TIGHT,TIMES,TITLE,TODAY,TOPIC,TOTAL,TOUCH,TOUGH,TOWER,TRACK,TRADE,TRAIN,TREAT,TREND,TRIAL,TRIBE,TRICK,TRUCK,TRULY,TRUST,TRUTH,TWICE,UNDER,UNION,UNITY,UNTIL,UPPER,UPSET,URBAN,USAGE,USUAL,VALID,VALUE,VIDEO,VIRUS,VISIT,VITAL,VOICE,VOTER,WAGON,WASTE,WATCH,WATER,WHEEL,WHERE,WHICH,WHILE,WHITE,WHOLE,WHOSE,WOMAN,WOMEN,WORDS,WORLD,WORRY,WORSE,WORST,WORTH,WOULD,WOUND,WRITE,WRONG,YIELD,YOUNG,YOUTH,AISLE,BINGO,BLAST,BULLY,CARGO,CHALK,CHOKE,CRISP,CURLY,DAISY,DART,DECAL,DEMON,DIZZY,DUMMY,DWARF,FABLE,FANCY,FEAST,FENCE,FETCH,FEVER,FLAKE,FLOCK,FLUFF,FROST,GLIDE,GRILL,HAIRY,HATCH,HOVER,HURRY,ITCHY,JELLY,JUMBO,KNOCK,LEAKY,LEAP,LOVER,LUNGE,MADAM,MAMMA,MIMIC,MOIST,MUMMY,NASTY,NINJA,ONION,OVAL,PADDY,PANSY,PASTA,PEARL,PEDAL,PENNY,PESTS,PIZZA,PLUMP,POUCH,PROWL,PUPPY,QUACK,QUERY,RADAR,RASPY,RAZOR,RHYME,ROAST,ROBOT,RUMOR,SALAD,SALSA,SAUCE,SCOLD,SCOOP,SCRAP,SHADY,SHAKE,SHINE,SHIRT,SHOVE,SHRUB,SHRUG,SKATE,SKULL,SLANG,SLASH,SLATE,SMASH,SNAIL,SNAKE,SNEAK,SNIFF,SNOWY,SPICE,SPICY,SPIKE,SPILL,SPINE,SPLAT,SPOON,SPOUT,SPRAY,SPURT,SQUAD,SQUAT,STAIN,STAMP,STARE,STEEP,STERN,STING,STOOL,STRAP,STRAW,STUMP,SWAMP,SWARM,SWEAT,SWELL,SWIFT,SWIPE,SWIRL,SWOOP,SYRUP,TABOO,TAFFY,TAINT,TALLY,TALON,TAMER,TANGO,TAPER,TAROT,TASTE,TASTY,TAUNT,TEASE,TEMPO,TENOR,THUMB,UMPIR,UNCLE,UNZIP,VAGUE,VALET,VENOM,VERGE,VIGOR,VILLA,VOCAL,VOGUE,WACKY,WAFER,WALTZ,WASTE,WEAVE,WEIRD,WHEAT,WHIFF,WHISK,WHISPER,WIDOW,WINCE,WINDY,WIPER,WITCH,WRIST,YACHT,YEARN,YOUTH,ZEBRA,ZIPPY";
         
         const VALID_GUESSES = [...new Set([...Object.values(CATEGORIES).flat(), ...COMMON_WORDS_STRING.split(",")])];
 
@@ -953,13 +952,30 @@
         let stats = JSON.parse(localStorage.getItem('syllabix-stats-v2')) || { played: 0, won: 0, currentStreak: 0, maxStreak: 0, guesses: {1:0, 2:0, 3:0, 4:0, 5:0, 6:0} };
         if (!stats.daily) stats.daily = { date: "", status: "", attempts: 0, word: "" };
 
+        // --- NEW: URL CHALLENGE DETECTION ---
         window.addEventListener('load', () => {
-            startSpaceTheme(); // Start default theme animation
+            startSpaceTheme(); 
             initBoardAndKeyboard(); 
+            
+            // Check for Custom Challenge Link
+            const urlParams = new URLSearchParams(window.location.search);
+            const challenge = urlParams.get('challenge');
+            
             const splash = document.getElementById('splash-screen');
             setTimeout(() => {
                 splash.style.opacity = '0';
-                setTimeout(() => { splash.style.display = 'none'; }, 600);
+                setTimeout(() => { 
+                    splash.style.display = 'none'; 
+                    
+                    if(challenge) {
+                        try {
+                            const decodedWord = atob(challenge);
+                            if(decodedWord.length === 5 && /^[A-Z]+$/.test(decodedWord)) {
+                                startChallengeMode(decodedWord);
+                            }
+                        } catch(e) { console.log("Invalid challenge link"); }
+                    }
+                }, 600);
             }, 2500);
         });
 
@@ -968,6 +984,45 @@
                 e.preventDefault(); e.returnValue = '';
             }
         });
+
+        // --- NEW: STUMP YOUR FRIENDS LOGIC ---
+        function createChallengeLink() {
+            let word = prompt("Enter a 5-letter word to challenge your friends:");
+            if(word) {
+                word = word.toUpperCase().trim();
+                if(word.length === 5 && /^[A-Z]+$/.test(word)) {
+                    const encoded = btoa(word);
+                    let currentUrl = window.location.href.split('?')[0];
+                    const finalLink = `${currentUrl}?challenge=${encoded}`;
+                    
+                    // Copy to clipboard
+                    const tempInput = document.createElement("input");
+                    tempInput.value = finalLink;
+                    document.body.appendChild(tempInput);
+                    tempInput.select();
+                    document.execCommand("copy");
+                    document.body.removeChild(tempInput);
+                    
+                    alert("Link Copied! Send it to a friend and they will be forced to guess: " + word);
+                } else {
+                    alert("Word must be exactly 5 letters containing only English alphabets.");
+                }
+            }
+        }
+
+        function startChallengeMode(word) {
+            targetWord = word;
+            currentCategory = "Custom Challenge";
+            const catSelect = document.getElementById('categorySelect');
+            document.getElementById('customModeOption').style.display = "block";
+            catSelect.value = "Custom Challenge";
+            
+            const catScreen = document.getElementById('category-screen');
+            catScreen.style.display = 'none';
+            resetGame(true); // Pass true to PREVENT overwriting the targetWord
+            showMsg("🎯 You've been challenged! Guess the secret word.");
+        }
+
 
         function checkDailyLock() {
             const today = new Date().toLocaleDateString();
@@ -1035,6 +1090,11 @@
             isPaused = false;
             document.getElementById('pauseModal').style.display = 'none';
             triggerFeedback('ui-click');
+            
+            // If they were playing a custom challenge, clear the URL so they can play normally
+            if(currentCategory === "Custom Challenge") {
+                window.history.pushState({}, document.title, window.location.pathname);
+            }
             returnToMenu();
         }
 
@@ -1044,6 +1104,12 @@
             if (category === 'Daily' && checkDailyLock()) {
                 showDailyLock();
                 return;
+            }
+
+            // Remove Custom mode if they pick something else
+            if(category !== 'Custom Challenge') {
+                document.getElementById('customModeOption').style.display = "none";
+                window.history.pushState({}, document.title, window.location.pathname);
             }
 
             currentCategory = category;
@@ -1061,6 +1127,12 @@
                 showDailyLock();
                 return; 
             }
+            
+            if(newCat !== 'Custom Challenge') {
+                document.getElementById('customModeOption').style.display = "none";
+                window.history.pushState({}, document.title, window.location.pathname);
+            }
+
             currentCategory = newCat;
             resetGame(); 
             showMsg(`Subject changed to: ${currentCategory}`);
@@ -1077,7 +1149,7 @@
             }
             
             isCountdown = willBeCountdown;
-            resetGame();
+            resetGame(currentCategory === "Custom Challenge"); // preserve custom word if active
             showMsg(isCountdown ? `Timer set to: 5 Min Countdown` : `Timer set to: Count Up`);
             setTimeout(() => { if(document.getElementById('message').textContent.includes('Timer')) showMsg(""); }, 2000);
         }
@@ -1208,13 +1280,16 @@
             showEndgameButtons();
         }
 
-        function resetGame() {
-            if (currentCategory === "Daily") {
-                const dailyPool = Object.values(CATEGORIES).flat();
-                const daysSinceEpoch = Math.floor(Date.now() / 86400000); 
-                targetWord = dailyPool[daysSinceEpoch % dailyPool.length];
-            } else {
-                targetWord = CATEGORIES[currentCategory][Math.floor(Math.random() * CATEGORIES[currentCategory].length)]; 
+        // Updated to support keeping a custom target word
+        function resetGame(keepTarget = false) {
+            if (!keepTarget) {
+                if (currentCategory === "Daily") {
+                    const dailyPool = Object.values(CATEGORIES).flat();
+                    const daysSinceEpoch = Math.floor(Date.now() / 86400000); 
+                    targetWord = dailyPool[daysSinceEpoch % dailyPool.length];
+                } else {
+                    targetWord = CATEGORIES[currentCategory][Math.floor(Math.random() * CATEGORIES[currentCategory].length)]; 
+                }
             }
             
             currentRow = 0; currentCol = 0; gameOver = false; guesses = Array(6).fill(""); boardEmoji = [];
@@ -1236,7 +1311,8 @@
             document.getElementById('defineBtn').style.display = "none";
             document.getElementById('playAgainBtn').style.display = "none";
             
-            showMsg(""); startTimer(); 
+            if(!keepTarget) showMsg(""); 
+            startTimer(); 
         }
 
         function handleInput(k) {
@@ -1374,6 +1450,9 @@
         function fireConfetti() { confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, zIndex: 1000 }); }
 
         function saveStats(won) {
+            // Don't save stats for custom friend challenges to not ruin player's true win rate
+            if(currentCategory === "Custom Challenge") return; 
+
             stats.played++;
             if (won) {
                 stats.won++;
@@ -1455,8 +1534,7 @@
         }
 
         function openShareAppMenu() {
-            let currentUrl = window.location.href;
-            if (currentUrl.includes("file://") || currentUrl.includes("C:/")) currentUrl = "https://your-github-username.github.io/syllabix/"; 
+            let currentUrl = window.location.href.split('?')[0];
             document.getElementById('gameLinkInput').value = currentUrl;
             toggleModal('appShareModal');
         }
