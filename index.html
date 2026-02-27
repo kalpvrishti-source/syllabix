@@ -127,6 +127,7 @@
             align-items: center; border-bottom: 1px solid var(--border); 
             padding-bottom: 15px; margin-bottom: 15px; transition: border-color 0.4s;
         }
+        .header-center { display: flex; flex-direction: column; align-items: center; }
         .header h1 { margin: 0; font-size: 2.2rem; letter-spacing: 2px; text-align: center; text-transform: uppercase; text-shadow: 0 2px 4px rgba(0,0,0,0.8);}
         .header-left { display: flex; gap: 8px; justify-content: flex-start; flex-wrap: wrap; }
         .header-right { display: flex; flex-direction: row; align-items: center; justify-content: flex-end; gap: 10px; font-size: 0.85rem; }
@@ -195,7 +196,7 @@
         }
         .modal-content {
             background-color: rgba(18, 18, 19, 0.95); color: var(--text); padding: 25px; border-radius: 12px;
-            max-width: 400px; width: 90%; border: 1px solid var(--correct);
+            max-width: 450px; width: 95%; border: 1px solid var(--correct);
             box-shadow: 0 10px 30px rgba(0,0,0,0.8);
             max-height: 90vh; overflow-y: auto;
         }
@@ -217,8 +218,9 @@
         .xp-bar-fill { background: linear-gradient(90deg, var(--present), var(--correct)); height: 100%; transition: width 0.8s cubic-bezier(0.25, 1, 0.5, 1); }
         .xp-text { font-size: 0.8rem; margin-top: 6px; opacity: 0.7; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;}
 
-        .stat-container { display: flex; justify-content: space-around; margin-bottom: 20px; text-align: center; gap: 10px;}
-        .stat-box { display: flex; flex-direction: column; align-items: center; }
+        /* Updated to support flexing on Mobile */
+        .stat-container { display: flex; justify-content: space-around; flex-wrap: wrap; margin-bottom: 20px; text-align: center; gap: 10px;}
+        .stat-box { display: flex; flex-direction: column; align-items: center; min-width: 70px;}
         .stat-num { font-size: 1.8rem; font-weight: bold; }
         .stat-label { font-size: 0.70rem; opacity: 0.7; text-transform: uppercase; }
         .graph-row { display: flex; align-items: center; margin-bottom: 5px; font-size: 0.9rem; font-weight: bold;}
@@ -352,7 +354,10 @@
             <div class="cat-screen-sub">Select a category to start the game</div>
             
             <div class="cat-grid">
+                <button class="cat-btn-large" style="grid-column: 1 / -1; border-color: #f5793a; color: #fcdbd3; background: rgba(245, 121, 58, 0.25);" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); startGame('Survival')">☠️ SURVIVAL MODE ☠️</button>
+
                 <button class="cat-btn-large" style="grid-column: 1 / -1; border-color: #9c27b0; color: #e1bee7; background: rgba(156, 39, 176, 0.2);" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); createChallengeLink()">🔗 Stump a Friend 🔗</button>
+
                 <button class="cat-btn-large" style="grid-column: 1 / -1; border-color: var(--present); color: var(--present);" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); startGame('Daily')">⭐ PLAY DAILY CHALLENGE ⭐</button>
                 
                 <button class="cat-btn-large" onmouseenter="triggerFeedback('hover')" onclick="triggerFeedback('ui-click'); startGame('General')">🌍 General</button>
@@ -410,7 +415,14 @@
             <button class="icon-btn" onclick="triggerFeedback('ui-click'); openShareAppMenu()" title="Share or Download Game">📥</button>
             <button class="icon-btn" id="muteBtn" onclick="toggleMute()" title="Toggle Sound">🔊</button>
         </div>
-        <h1>SYLLABIX</h1>
+        
+        <div class="header-center">
+            <h1>SYLLABIX</h1>
+            <div id="survival-stats" style="display:none; font-weight:bold; color:var(--present); font-size: 0.9rem; margin-top:-5px; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">
+                Score: <span id="surv-score">0</span> &nbsp;|&nbsp; <span id="surv-lives">❤️❤️❤️</span>
+            </div>
+        </div>
+
         <div class="header-right">
             <span id="timer">00:00</span>
             <button class="icon-btn" onclick="togglePause()" title="Pause Game" style="width: 32px; height: 32px; font-size: 0.9rem;">⏸️</button>
@@ -456,6 +468,7 @@
                 <span class="settings-label">Subject</span>
                 <select id="categorySelect" onchange="triggerFeedback('ui-click'); changeCategoryMidGame()">
                     <option value="Daily">⭐ Daily Challenge</option>
+                    <option value="Survival">☠️ Survival Mode</option>
                     <option id="customModeOption" value="Custom Challenge" style="display:none;">🎯 Custom Challenge</option>
                     <option value="General">General</option>
                     <option value="Science">Science</option>
@@ -531,6 +544,7 @@
                 <div class="stat-box"><span class="stat-num" id="stat-winpct">0</span><span class="stat-label">Win %</span></div>
                 <div class="stat-box"><span class="stat-num" id="stat-streak" style="color: var(--correct);">0</span><span class="stat-label">🔥 Streak</span></div>
                 <div class="stat-box"><span class="stat-num" id="stat-maxstreak">0</span><span class="stat-label">👑 Best</span></div>
+                <div class="stat-box"><span class="stat-num" id="stat-survival" style="color: #f5793a;">0</span><span class="stat-label">☠️ Survival</span></div>
             </div>
             
             <h4 style="margin-top: 25px; margin-bottom: 10px; text-align: center; letter-spacing: 1px;">GUESS DISTRIBUTION</h4>
@@ -1021,13 +1035,16 @@
         let pauseStartTime = 0;
         let finalTimeStr = "00:00";
         
+        // --- NEW: SURVIVAL VARIABLES ---
+        let survivalScore = 0;
+        let survivalLives = 3;
+
         let stats = JSON.parse(localStorage.getItem('syllabix-stats-v2')) || { played: 0, won: 0, currentStreak: 0, maxStreak: 0, guesses: {1:0, 2:0, 3:0, 4:0, 5:0, 6:0} };
         if (!stats.daily) stats.daily = { date: "", status: "", attempts: 0, word: "" };
         if (!stats.badges) stats.badges = { speed_demon: false, clutch: false, brainiac: false, night_owl: false, daily_master: false };
-        
-        // --- NEW: INITIALIZE XP TRACKER ---
         if (typeof stats.xp === 'undefined') stats.xp = 0;
         if (typeof stats.level === 'undefined') stats.level = 1;
+        if (typeof stats.survivalHighScore === 'undefined') stats.survivalHighScore = 0;
 
         window.addEventListener('load', () => {
             startSpaceTheme(); 
@@ -1170,6 +1187,7 @@
             returnToMenu();
         }
 
+        // --- NEW: SURVIVAL START LOGIC ---
         function startGame(category) {
             if (audioCtx.state === 'suspended') audioCtx.resume();
             
@@ -1185,6 +1203,15 @@
 
             currentCategory = category;
             document.getElementById('categorySelect').value = category; 
+            
+            if (category === 'Survival') {
+                survivalScore = 0;
+                survivalLives = 3;
+                updateSurvivalUI();
+            } else {
+                document.getElementById('survival-stats').style.display = 'none';
+            }
+
             const catScreen = document.getElementById('category-screen');
             catScreen.style.opacity = '0';
             catScreen.style.transform = 'translateY(-20px)';
@@ -1205,15 +1232,34 @@
             }
 
             currentCategory = newCat;
+            
+            if (currentCategory === 'Survival') {
+                survivalScore = 0;
+                survivalLives = 3;
+                updateSurvivalUI();
+            } else {
+                document.getElementById('survival-stats').style.display = 'none';
+            }
+
             resetGame(); 
             showMsg(`Subject changed to: ${currentCategory}`);
             setTimeout(() => { if(document.getElementById('message').textContent.includes('Subject')) showMsg(""); }, 2000);
         }
 
+        // --- NEW: UPDATE SURVIVAL UI ---
+        function updateSurvivalUI() {
+            document.getElementById('survival-stats').style.display = 'block';
+            document.getElementById('surv-score').textContent = survivalScore;
+            
+            let hearts = "";
+            for(let i=0; i<survivalLives; i++) hearts += "❤️";
+            document.getElementById('surv-lives').textContent = hearts === "" ? "💀" : hearts;
+        }
+
         function toggleCountdown() {
             const willBeCountdown = document.getElementById('countdownToggle').checked;
             
-            if (currentCategory === 'Daily' && (currentRow > 0 || currentCol > 0) && !gameOver) {
+            if ((currentCategory === 'Daily' || currentCategory === 'Survival') && (currentRow > 0 || currentCol > 0) && !gameOver) {
                 showMsg("Can't change timer mid-game!");
                 document.getElementById('countdownToggle').checked = isCountdown;
                 return;
@@ -1298,7 +1344,7 @@
                     const s = (elapsed % 60).toString().padStart(2, '0');
                     document.getElementById('timer').textContent = `${m}:${s}`;
                     
-                    if (elapsed >= 300 && !timeHintOffered && !gameOver) {
+                    if (elapsed >= 300 && !timeHintOffered && !gameOver && currentCategory !== "Survival") {
                         timeHintOffered = true;
                         toggleModal('timeHintModal');
                     }
@@ -1317,7 +1363,7 @@
                     const s = (remaining % 60).toString().padStart(2, '0');
                     document.getElementById('timer').textContent = `${m}:${s}`;
                     
-                    if (elapsed >= 150 && !timeHintOffered && !gameOver) {
+                    if (elapsed >= 150 && !timeHintOffered && !gameOver && currentCategory !== "Survival") {
                         timeHintOffered = true;
                         toggleModal('timeHintModal');
                     }
@@ -1339,9 +1385,36 @@
             }
         }
 
+        // --- NEW: SURVIVAL END LOGIC ---
+        function endSurvivalGame() {
+            freezeTime();
+            clearInterval(timerInt);
+            gameOver = true;
+            
+            if(survivalScore > stats.survivalHighScore) {
+                stats.survivalHighScore = survivalScore;
+                setTimeout(() => showMsg(`New High Score: ${survivalScore}! 🏆`), 3000);
+            }
+            
+            const { xpGained, levelUp } = calculateAndAddXP(0, survivalScore);
+            if (levelUp) {
+                setTimeout(() => { showMsg(`LEVEL UP! You are now Level ${stats.level}! 🚀`); triggerFeedback('win'); }, 5000);
+            }
+            
+            saveStats(false);
+            showEndgameButtons();
+        }
+
         function timeUp() {
             if(gameOver) return;
             gameOver = true;
+            
+            if (currentCategory === "Survival") {
+                showMsg(`Time's Up! Final Score: ${survivalScore}`, true);
+                endSurvivalGame();
+                return;
+            }
+
             freezeTime();
             clearInterval(timerInt);
             triggerFeedback('error');
@@ -1351,12 +1424,37 @@
             showEndgameButtons();
         }
 
+        // --- NEW: SURVIVAL BOARD RESET ---
+        function resetBoardForNextWord() {
+            if (currentCategory === "Survival" && survivalLives <= 0) return; 
+            
+            currentRow = 0; currentCol = 0; gameOver = false; guesses = Array(6).fill(""); boardEmoji = []; letterStates = {};
+            
+            const allWords = Object.values(CATEGORIES).flat();
+            targetWord = allWords[Math.floor(Math.random() * allWords.length)];
+            
+            for(let i=0; i<6; i++) {
+                for(let j=0; j<5; j++) {
+                    const t = document.getElementById(`tile-${i}-${j}`);
+                    t.textContent = ""; t.className = 'tile'; 
+                }
+            }
+            document.querySelectorAll('.tk-key').forEach(k => {
+                k.className = 'tk-key';
+                if(k.id === 'tk-ENTER' || k.id === 'tk-⌫') k.classList.add('tk-action');
+            });
+            showMsg("");
+        }
+
         function resetGame(keepTarget = false) {
             if (!keepTarget) {
                 if (currentCategory === "Daily") {
                     const dailyPool = Object.values(CATEGORIES).flat();
                     const daysSinceEpoch = Math.floor(Date.now() / 86400000); 
                     targetWord = dailyPool[daysSinceEpoch % dailyPool.length];
+                } else if (currentCategory === "Survival") {
+                    const allWords = Object.values(CATEGORIES).flat();
+                    targetWord = allWords[Math.floor(Math.random() * allWords.length)]; 
                 } else {
                     targetWord = CATEGORIES[currentCategory][Math.floor(Math.random() * CATEGORIES[currentCategory].length)]; 
                 }
@@ -1428,17 +1526,21 @@
             setTimeout(() => { rows[currentRow].classList.remove('shake'); }, 400); 
         }
 
-        // --- NEW: XP ENGINE & LEVEL UP LOGIC ---
-        function calculateAndAddXP(elapsedSecs) {
-            if(currentCategory === "Custom Challenge") return 0; 
+        function calculateAndAddXP(elapsedSecs, survScore = 0) {
+            if(currentCategory === "Custom Challenge") return { xpGained: 0, levelUp: false }; 
             
-            let xpGained = 10; // Base Win
-            if (currentCategory === "Daily") xpGained += 15;
-            if (elapsedSecs < 60) xpGained += 5;
+            let xpGained = 0;
+            
+            if (currentCategory === "Survival") {
+                xpGained = survScore * 5; 
+            } else {
+                xpGained = 10; 
+                if (currentCategory === "Daily") xpGained += 15;
+                if (elapsedSecs < 60) xpGained += 5;
+            }
             
             stats.xp += xpGained;
             
-            // Level Thresholds
             const lvl2Target = 50;
             const lvl3Target = 150;
             let levelUp = false;
@@ -1452,7 +1554,7 @@
         }
 
         function checkAchievements(elapsedSecs) {
-            if(currentCategory === "Custom Challenge") return; 
+            if(currentCategory === "Custom Challenge" || currentCategory === "Survival") return; 
             
             let unlockedAny = false;
             let newlyUnlocked = [];
@@ -1512,42 +1614,86 @@
             }
             boardEmoji.push(rowEmoji);
 
+            // --- WIN LOGIC ---
             if(guess === targetWord) {
-                freezeTime();
-                clearInterval(timerInt);
-                triggerFeedback('win');
-                
-                const elapsedSecs = Math.floor((Date.now() - startTime) / 1000);
-                const { xpGained, levelUp } = calculateAndAddXP(elapsedSecs);
-                checkAchievements(elapsedSecs);
+                if (currentCategory === "Survival") {
+                    survivalScore++;
+                    updateSurvivalUI();
+                    triggerFeedback('win');
+                    showMsg("Correct! Next word... 🚀");
+                    fireConfetti();
+                    setTimeout(resetBoardForNextWord, 2000);
+                } else {
+                    freezeTime();
+                    clearInterval(timerInt);
+                    triggerFeedback('win');
+                    
+                    const elapsedSecs = Math.floor((Date.now() - startTime) / 1000);
+                    const { xpGained, levelUp } = calculateAndAddXP(elapsedSecs);
+                    checkAchievements(elapsedSecs);
 
-                let winMsg = "Impressive! 🎉";
-                if(xpGained > 0) winMsg = `Impressive! 🎉 (+${xpGained} XP)`;
-                showMsg(winMsg);
-                
-                if (levelUp) {
-                    setTimeout(() => { showMsg(`LEVEL UP! You are now Level ${stats.level}! 🚀`); triggerFeedback('win'); }, 4000);
+                    let winMsg = "Impressive! 🎉";
+                    if(xpGained > 0) winMsg = `Impressive! 🎉 (+${xpGained} XP)`;
+                    showMsg(winMsg);
+                    
+                    if (levelUp) {
+                        setTimeout(() => { showMsg(`LEVEL UP! You are now Level ${stats.level}! 🚀`); triggerFeedback('win'); }, 4000);
+                    }
+
+                    fireConfetti();
+                    if (currentCategory === "Daily") stats.daily = { date: new Date().toLocaleDateString(), status: "won", attempts: currentRow + 1, word: targetWord };
+                    saveStats(true);
+                    showEndgameButtons();
                 }
-
-                fireConfetti();
-                if (currentCategory === "Daily") stats.daily = { date: new Date().toLocaleDateString(), status: "won", attempts: currentRow + 1, word: targetWord };
-                saveStats(true);
-                showEndgameButtons();
+            
+            // --- LOSE LOGIC ---
             } else if(currentRow === 5) {
-                freezeTime();
-                clearInterval(timerInt);
-                triggerFeedback('error');
-                showMsg(`You used all attempts! Word: ${targetWord}`, true);
-                if (currentCategory === "Daily") stats.daily = { date: new Date().toLocaleDateString(), status: "lost", attempts: 6, word: targetWord };
-                saveStats(false);
-                showEndgameButtons();
+                if (currentCategory === "Survival") {
+                    survivalLives--;
+                    updateSurvivalUI();
+                    triggerFeedback('error');
+                    
+                    if(survivalLives > 0) {
+                        showMsg(`Ouch! Word was: ${targetWord}`, true);
+                        setTimeout(resetBoardForNextWord, 3000);
+                    } else {
+                        showMsg(`Game Over! Final Score: ${survivalScore}`, true);
+                        endSurvivalGame();
+                    }
+                } else {
+                    freezeTime();
+                    clearInterval(timerInt);
+                    triggerFeedback('error');
+                    showMsg(`You used all attempts! Word: ${targetWord}`, true);
+                    if (currentCategory === "Daily") stats.daily = { date: new Date().toLocaleDateString(), status: "lost", attempts: 6, word: targetWord };
+                    saveStats(false);
+                    showEndgameButtons();
+                }
             } else { 
                 currentRow++; currentCol = 0; gameOver = false; 
             }
         }
 
+        // --- NEW: SURVIVAL GIVE UP ---
         function giveUpWord() {
             if(gameOver) return;
+            
+            if (currentCategory === "Survival") {
+                gameOver = true;
+                survivalLives--;
+                updateSurvivalUI();
+                triggerFeedback('error');
+                
+                if(survivalLives > 0) {
+                    showMsg(`You skipped! Word was: ${targetWord}`, true);
+                    setTimeout(resetBoardForNextWord, 3000);
+                } else {
+                    showMsg(`Game Over! Final Score: ${survivalScore}`, true);
+                    endSurvivalGame();
+                }
+                return;
+            }
+
             gameOver = true;
             freezeTime();
             clearInterval(timerInt);
@@ -1583,7 +1729,7 @@
         function fireConfetti() { confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, zIndex: 1000 }); }
 
         function saveStats(won) {
-            if(currentCategory === "Custom Challenge") return; 
+            if(currentCategory === "Custom Challenge" || currentCategory === "Survival") return; 
 
             stats.played++;
             if (won) {
@@ -1598,7 +1744,6 @@
         }
 
         function openStats() {
-            // Populate XP Bar
             document.getElementById('player-level-title').textContent = `LEVEL ${stats.level}`;
             const xpText = document.getElementById('xp-text-detail');
             const xpFill = document.getElementById('xp-bar-fill');
@@ -1618,6 +1763,7 @@
             document.getElementById('stat-winpct').textContent = stats.played === 0 ? 0 : Math.round((stats.won / stats.played) * 100);
             document.getElementById('stat-streak').textContent = stats.currentStreak || 0;
             document.getElementById('stat-maxstreak').textContent = stats.maxStreak || 0;
+            document.getElementById('stat-survival').textContent = stats.survivalHighScore || 0;
 
             const distContainer = document.getElementById('guess-distribution');
             distContainer.innerHTML = '';
@@ -1633,7 +1779,7 @@
                 const bar = document.createElement('div'); bar.className = 'graph-bar'; 
                 bar.style.width = `${widthPct}%`; bar.textContent = val;
                 
-                if (gameOver && val > 0 && currentRow + 1 === i && guesses[currentRow] === targetWord) {
+                if (gameOver && val > 0 && currentRow + 1 === i && guesses[currentRow] === targetWord && currentCategory !== "Survival") {
                     bar.classList.add('highlight');
                 }
                 row.appendChild(num); row.appendChild(bar);
@@ -1698,7 +1844,13 @@
             let timeLabel = finalTimeStr;
             if (isCountdown) timeLabel += " (Timed)";
             
-            const text = `Syllabix [${currentCategory}] ${currentRow === 6 && guesses[5] !== targetWord ? 'X' : currentRow + 1}/6 ⏱️ ${timeLabel}\n⭐ Level: ${stats.level}\n\n${boardEmoji.join('\n')}`;
+            let text = "";
+            if (currentCategory === "Survival") {
+                text = `Syllabix [Survival Mode] ☠️\nScore: ${survivalScore}\nHigh Score: ${stats.survivalHighScore}\n⏱️ ${timeLabel}\n⭐ Level: ${stats.level}`;
+            } else {
+                text = `Syllabix [${currentCategory}] ${currentRow === 6 && guesses[5] !== targetWord ? 'X' : currentRow + 1}/6 ⏱️ ${timeLabel}\n⭐ Level: ${stats.level}\n\n${boardEmoji.join('\n')}`;
+            }
+            
             navigator.clipboard.writeText(text);
             showMsg("Results copied to clipboard!");
             setTimeout(() => { if(document.getElementById('message').textContent === "Results copied to clipboard!") showMsg(""); }, 2000);
