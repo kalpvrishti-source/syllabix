@@ -42,11 +42,7 @@
             transition: color 0.4s; 
         }
 
-        #theme-canvas {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            z-index: -10; pointer-events: none;
-            will-change: transform; transform: translateZ(0);
-        }
+        #theme-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -10; pointer-events: none; will-change: transform; transform: translateZ(0); }
 
         #splash-screen {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
@@ -139,11 +135,27 @@
         .modal-content {
             background-color: rgba(18, 18, 19, 0.95); color: var(--text); padding: 25px; border-radius: 12px;
             max-width: 450px; width: 95%; border: 1px solid var(--correct); box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            max-height: 90vh; overflow-y: auto;
+            max-height: 90vh; overflow-y: auto; overflow-x: hidden;
         }
         .modal-content::-webkit-scrollbar { width: 4px; } 
         .modal-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
         
+        /* --- NEW CSS FOR ANIMATED GAME MODES CARDS --- */
+        .m-card {
+            display: flex; align-items: center; background: rgba(0,0,0,0.4); 
+            border: 1px solid var(--border); border-radius: 8px; padding: 15px; margin-bottom: 12px;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); cursor: default;
+            opacity: 0; transform: translateX(30px);
+        }
+        .m-card:hover { transform: scale(1.02) translateY(-2px) !important; background: rgba(0,0,0,0.6); box-shadow: 0 8px 15px rgba(0,0,0,0.4); border-color: var(--text);}
+        .m-icon { font-size: 2.2rem; margin-right: 15px; min-width: 40px; text-align: center; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+        .m-text h4 { margin: 0 0 6px 0; font-size: 1.1rem; color: var(--text); letter-spacing: 0.5px; text-transform: uppercase;}
+        .m-text p { margin: 0; font-size: 0.85rem; color: #aaa; line-height: 1.4;}
+
+        .modal.active-modal .m-card { animation: slideInModes 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; animation-delay: var(--delay); }
+        @keyframes slideInModes { to { opacity: 1; transform: translateX(0) scale(1); } }
+        /* ------------------------------------------- */
+
         .settings-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 15px; }
         .settings-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0;}
         .settings-label { font-weight: bold; font-size: 1rem; }
@@ -170,10 +182,6 @@
         .badge.unlocked .badge-icon { filter: grayscale(0%) opacity(1); text-shadow: 0 0 15px rgba(255,255,255,0.4); }
         .badge-name { font-size: 0.65rem; font-weight: bold; line-height: 1.2; opacity: 0.4; }
         .badge.unlocked .badge-name { opacity: 1; color: var(--correct); }
-
-        .dict-list { max-height: 250px; overflow-y: auto; text-align: left; font-size: 0.95rem; padding: 10px; border-radius: 5px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); }
-        .dict-list p { margin: 8px 0; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
-        .dict-list p:last-child { border-bottom: none; }
 
         .example-row { display: flex; align-items: center; margin-bottom: 12px; font-size: 0.95rem; }
         .mini-tile { width: 35px; height: 35px; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 1.2rem; margin-right: 8px; border: 2px solid var(--border); border-radius: 4px; }
@@ -210,13 +218,9 @@
         .tut-hand { position: absolute; font-size: 2.5rem; opacity: 0; transition: top 0.4s cubic-bezier(0.25, 1, 0.5, 1), left 0.4s cubic-bezier(0.25, 1, 0.5, 1), transform 0.1s; z-index: 100000; pointer-events: none; user-select: none; text-shadow: 0 4px 10px rgba(0,0,0,0.5); }
         .tut-text-box { font-size: 1.2rem; font-weight: bold; color: var(--present); text-align: center; height: 60px; margin-bottom: 20px; padding: 0 20px; text-shadow: 0 2px 4px rgba(0,0,0,0.8);}
 
-        /* MOBILE FIXES */
         @media (max-width: 700px) {
             .game-wrapper { flex-direction: column; align-items: center; gap: 20px; margin-top: 5px; width: 100%;}
-            .modal, .modal-content, .cat-screen-inner, #splash-screen {
-                backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
-                background-color: rgba(15, 15, 15, 0.98) !important;
-            }
+            .modal, .modal-content, .cat-screen-inner, #splash-screen { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; background-color: rgba(15, 15, 15, 0.98) !important; }
             .tracker-board { width: 100%; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); pointer-events: auto; }
             .tracker-title { display: none; }
             .tk-action { display: flex; flex: 1.5; font-size: 0.8rem; }
@@ -272,15 +276,46 @@
     </div>
 
     <div id="modesModal" class="modal" style="z-index: 6000;" onclick="triggerFeedback('ui-click'); toggleModal('modesModal')">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <h3 style="text-align: center; margin-top: 0; letter-spacing: 1px;">GAME MODES</h3>
-            <div class="dict-list" style="max-height: 50vh;">
-                <p><b>⭐ Daily Challenge:</b> Every player in the world guesses the exact same 5-letter word. You only get one try per day. Resets at midnight!</p>
-                <p><b>☠️ Survival Mode:</b> Endless gameplay. You get 3 lives (❤️❤️❤️). Solve words back-to-back as the timer runs. You earn massive XP for every word survived.</p>
-                <p><b>🔗 Stump a Friend:</b> Create a custom secret word (4 to 7 letters) and generate a unique link. Send it to a friend and see if they can solve your trap!</p>
-                <p><b>📚 Classic Subjects:</b> Pick a category and word length. Practice as much as you want to earn XP, level up, and unlock new themes.</p>
+        <div class="modal-content" onclick="event.stopPropagation()" style="padding: 20px;">
+            <h3 style="text-align: center; margin-top: 0; letter-spacing: 2px; margin-bottom: 20px;">GAME MODES</h3>
+            
+            <div style="display: flex; flex-direction: column; max-height: 60vh; overflow-y: auto; padding-right: 5px; overflow-x: hidden;">
+                
+                <div class="m-card" style="--delay: 0.1s; border-left: 5px solid var(--present);">
+                    <div class="m-icon">⭐</div>
+                    <div class="m-text">
+                        <h4>Daily Challenge</h4>
+                        <p>One global 5-letter word. One try per day. Resets every midnight!</p>
+                    </div>
+                </div>
+
+                <div class="m-card" style="--delay: 0.2s; border-left: 5px solid #f5793a;">
+                    <div class="m-icon">☠️</div>
+                    <div class="m-text">
+                        <h4>Survival Mode</h4>
+                        <p>Endless gameplay. You get 3 lives (❤️❤️❤️). Survive for massive XP.</p>
+                    </div>
+                </div>
+
+                <div class="m-card" style="--delay: 0.3s; border-left: 5px solid #9c27b0;">
+                    <div class="m-icon">🔗</div>
+                    <div class="m-text">
+                        <h4>Stump a Friend</h4>
+                        <p>Create a custom secret word and send a unique link to trap your friends.</p>
+                    </div>
+                </div>
+
+                <div class="m-card" style="--delay: 0.4s; border-left: 5px solid var(--correct);">
+                    <div class="m-icon">📚</div>
+                    <div class="m-text">
+                        <h4>Classic Subjects</h4>
+                        <p>Pick a subject and word length. Practice freely to level up & unlock themes.</p>
+                    </div>
+                </div>
+
             </div>
-            <button class="action-btn btn-neutral" onclick="triggerFeedback('ui-click'); toggleModal('modesModal')" style="margin-top:20px; width: 100%; border-radius:8px;">Got it!</button>
+            
+            <button class="action-btn btn-share" onclick="triggerFeedback('ui-click'); toggleModal('modesModal')" style="margin-top:20px; width: 100%; border-radius:8px; padding: 12px; font-size: 1.1rem; letter-spacing: 1px;">LET'S PLAY!</button>
         </div>
     </div>
 
@@ -308,7 +343,6 @@
             <button class="icon-btn" onclick="triggerFeedback('ui-click'); openSettings()" title="Settings">⚙️</button>
             <button class="icon-btn" onclick="triggerFeedback('ui-click'); toggleModal('helpModal')" title="How to play">?</button>
             <button class="icon-btn" onclick="triggerFeedback('ui-click'); openStats()" title="Statistics & Badges">📊</button>
-            <button class="icon-btn" onclick="triggerFeedback('ui-click'); toggleModal('dictModal')" title="Word Examples">📚</button>
             <button class="icon-btn" onclick="triggerFeedback('ui-click'); openShareAppMenu()" title="Share or Download Game">📥</button>
             <button class="icon-btn" id="muteBtn" onclick="toggleMute()" title="Toggle Sound">🔊</button>
         </div>
@@ -459,26 +493,6 @@
             <h4 style="margin-top: 30px; margin-bottom: 5px; text-align: center; letter-spacing: 1px; color: var(--present);">ACHIEVEMENTS</h4>
             <div id="badges-container" class="badges-container"></div>
             <button class="action-btn btn-neutral" onclick="triggerFeedback('ui-click'); toggleModal('statsModal')" style="margin-top:20px; width: 100%; border-radius:8px;">Close</button>
-        </div>
-    </div>
-
-    <div id="dictModal" class="modal" onclick="triggerFeedback('ui-click'); toggleModal('dictModal')">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <h3 style="text-align: center; margin-top: 0;">CATEGORY EXAMPLES</h3>
-            <p style="font-size: 0.85rem; opacity:0.7; text-align: center; margin-top: -10px;">A sneak peek at the types of words in each subject!</p>
-            <div class="dict-list">
-                <p><b>🌍 General:</b> SMART, BOARD, CLOCK...</p>
-                <p><b>🔭 Science:</b> ATOMS, FORCE, LASER...</p>
-                <p><b>🧪 Chemistry:</b> AMINE, OZONE, MOLAR...</p>
-                <p><b>🧬 Biology:</b> CELLS, BRAIN, VIRUS...</p>
-                <p><b>🦁 Zoology:</b> TIGER, WHALE, EAGLE...</p>
-                <p><b>🪐 Astronomy:</b> MARS, COMET, ORBIT...</p>
-                <p><b>🏛️ History:</b> INDUS, RUINS, MYTHS...</p>
-                <p><b>🎵 Music Tech:</b> AUDIO, MIXER, TEMPO...</p>
-                <p><b>➗ Maths / JEE:</b> GRAPH, SLOPE, AXIOM...</p>
-                <p><b>🌐 Geopolitics:</b> TRADE, ALLYS, PEACE...</p>
-            </div>
-            <button class="action-btn btn-neutral" onclick="triggerFeedback('ui-click'); toggleModal('dictModal')" style="margin-top:20px; width: 100%; border-radius:8px;">Close</button>
         </div>
     </div>
 
@@ -974,6 +988,18 @@
                 e.preventDefault(); e.returnValue = '';
             }
         });
+
+        // --- UPDATED ANIMATED MODAL TOGGLE ---
+        function toggleModal(id) {
+            const m = document.getElementById(id);
+            if (m.style.display === 'flex') {
+                m.style.display = 'none';
+                m.classList.remove('active-modal');
+            } else {
+                m.style.display = 'flex';
+                setTimeout(() => m.classList.add('active-modal'), 10); 
+            }
+        }
 
         function exportSave() {
             try {
@@ -1780,11 +1806,6 @@
 
         function openDictionary() {
             window.open(`https://www.merriam-webster.com/dictionary/${targetWord.toLowerCase()}`, '_blank');
-        }
-
-        function toggleModal(id) {
-            const m = document.getElementById(id);
-            m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
         }
 
         function showMsg(m, isError = false) { 
